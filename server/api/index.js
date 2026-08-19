@@ -5,13 +5,13 @@ const cors = require('cors');
 const session = require('express-session');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const passport = require('./config/passport');
-const apiRoutes = require('./routes/api');
-const ActivityLog = require('./models/ActivityLog');
+const passport = require('../config/passport');
+const apiRoutes = require('../routes/api');
+const ActivityLog = require('../models/ActivityLog');
 
 const app = express();
-// Render terminates HTTPS at its proxy. Trust the proxy so express-session
-// correctly handles secure cookies in production.
+
+// Vercel/Render proxy trust
 app.set('trust proxy', 1);
 
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -23,17 +23,16 @@ const globalLimiter = rateLimit({
 });
 app.use(globalLimiter);
 
-const PORT = process.env.PORT || 5000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const isProduction = process.env.NODE_ENV === 'production';
 
-console.log('--- Startup Config ---');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('isProduction:', isProduction);
-console.log('FRONTEND_URL:', FRONTEND_URL);
-console.log('----------------------');
-
-const allowedOrigins = [FRONTEND_URL, 'http://localhost', 'capacitor://localhost'];
+const allowedOrigins = [
+  FRONTEND_URL,
+  'http://localhost',
+  'http://localhost:5173',
+  'capacitor://localhost',
+  'https://localhost',
+];
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -45,11 +44,22 @@ app.use(cors({
   },
   credentials: true
 }));
+
 app.use(express.json({ limit: '10mb' }));
 
+// ── MongoDB + Sessions ────────────────────────────────────────────────────────
 const { MongoStore } = require('connect-mongo');
 
-// Setup Sessions
+// Lazy mongoose connection (reused across serverless invocations)
+let mongoConnected = false;
+async function connectDB() {
+  if (mongoConnected || mongoose.connection.readyState === 1) return;
+  await mongoose.connect(process.env.MONGODB_URI);
+  mongoConnected = true;
+  console.log('MongoDB connected');
+}
+connectDB().catch(err => console.error('MongoDB connection error:', err));
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'veggies_kitchen_super_secret_session_key',
   resave: false,
@@ -60,24 +70,17 @@ app.use(session({
   }),
   cookie: {
     secure: isProduction,
-    sameSite: 'lax',
+    sameSite: isProduction ? 'none' : 'lax',
     httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
+    maxAge: 1000 * 60 * 60 * 24 * 7
   }
 }));
 
-// Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-.then(() => console.log('MongoDB connected successfully'))
-.catch(err => console.error('MongoDB connection error:', err));
-
-// Auth Routes
+// ── Routes ────────────────────────────────────────────────────────────────────
 app.get('/auth/google', (req, res, next) => {
-  // Pass the returnTo path through OAuth state so we can redirect back after login
   const returnTo = req.query.returnTo || '#/';
   passport.authenticate('google', {
     scope: ['profile', 'email'],
@@ -85,30 +88,19 @@ app.get('/auth/google', (req, res, next) => {
   })(req, res, next);
 });
 
-app.get('/auth/google/callback', 
+app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: `${FRONTEND_URL}/#/account` }),
   async (req, res) => {
-    // Log Activity
     await ActivityLog.create({ action: 'User Logged In', user: req.user._id, details: { name: req.user.name } });
-    // Redirect to the page the user was on before login
     const returnTo = req.query.state || '#/';
     res.redirect(`${FRONTEND_URL}/${returnTo}`);
   }
 );
 
-// Ignore Chrome DevTools requests
-app.get('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => {
-  res.status(200).json({});
-});
+app.get('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => res.json({}));
+app.get('/health', (req, res) => res.json({ status: 'ok', ts: Date.now() }));
 
-// Health check endpoint for Render
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
-});
-
-// Use API Routes
 app.use('/api', apiRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// ── Export for Vercel (no app.listen) ────────────────────────────────────────
+module.exports = app;
