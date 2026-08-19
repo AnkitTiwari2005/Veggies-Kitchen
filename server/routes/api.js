@@ -34,7 +34,25 @@ const { isAuthenticated, isAdmin: isAdminJWT, optionalAuth } = require('../middl
 const razorpayService = require('../services/razorpay');
 const pushService = require('../services/pushNotifications');
 const User = require('../models/User');
-const admin = require('firebase-admin'); // for verifyIdToken
+// Lazy firebase-admin getter — only used in the verify-otp route.
+// Avoids crashing at startup if Firebase env vars aren't set.
+const getFirebaseAdmin = () => {
+  const admin = require('firebase-admin');
+  if (!admin.apps.length) {
+    if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
+      admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId:   process.env.FIREBASE_PROJECT_ID,
+          privateKey:  process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        }),
+      });
+    } else {
+      return null; // Firebase not configured
+    }
+  }
+  return admin;
+};
 
 const isAdmin = isAdminJWT; // override local isAdmin
 
@@ -381,7 +399,9 @@ router.post('/auth/login', authLimiter, async (req, res) => {
 router.post('/auth/verify-otp', authLimiter, async (req, res) => {
   try {
     const { firebaseToken } = req.body;
-    const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
+    const firebaseAdmin = getFirebaseAdmin();
+    if (!firebaseAdmin) return res.status(503).json({ error: 'OTP authentication not configured on this server.' });
+    const decodedToken = await firebaseAdmin.auth().verifyIdToken(firebaseToken);
     const phone = decodedToken.phone_number;
     
     let isNewUser = false;
