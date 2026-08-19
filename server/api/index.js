@@ -109,6 +109,13 @@ app.get('/auth/google/callback',
 
 app.get('/.well-known/appspecific/com.chrome.devtools.json', (_req, res) => res.json({}));
 
+app.get('/', (_req, res) => res.json({
+  name: 'Veggies Kitchen API',
+  status: 'running',
+  version: '1.0.0',
+  endpoints: ['/health', '/api', '/auth/google'],
+}));
+
 app.get('/health', (_req, res) => res.json({
   status: 'ok',
   db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
