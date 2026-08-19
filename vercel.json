@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://veggie-7vvt.onrender.com/api/:path*" },
+    { "source": "/auth/:path*", "destination": "https://veggie-7vvt.onrender.com/auth/:path*" }
+  ]
+}

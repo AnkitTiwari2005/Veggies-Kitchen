@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Veggies Kitchen</string>
+    <string name="title_activity_main">Veggies Kitchen</string>
+    <string name="package_name">com.veggieskitchen.app</string>
+    <string name="custom_url_scheme">com.veggieskitchen.app</string>
+</resources>

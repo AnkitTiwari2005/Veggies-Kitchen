@@ -1,0 +1,21 @@
+.privacy-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+.privacy-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 48px;
+  border-radius: 16px;
+  margin: 0 24px;
+}
+.privacy-section {
+  margin-bottom: 32px;
+}
+.privacy-section h2 {
+  margin-bottom: 12px;
+}
+.privacy-section p {
+  line-height: 1.6;
+}

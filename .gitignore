@@ -1,0 +1,59 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+dist
+dist-ssr
+*.local
+
+# Environment files — NEVER commit these
+.env
+.env.local
+.env.*.local
+server/.env
+server/.env.local
+
+# Sensitive data — NEVER commit these
+leads-*.json
+client_secret_*.json
+google-services.json
+keystore.jks
+*.keystore
+*.jks
+release.properties
+key.properties
+
+# Capacitor / Android
+# android/ is generated — commit it only when you want to track native changes
+# Uncomment the next line to exclude Android project from git:
+# android/
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/app/google-services.json
+
+# iOS (if added later)
+ios/App/Pods/
+ios/.xcode.env.local
+
+# Editor directories
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+.DS_Store
+Thumbs.db
