@@ -11,6 +11,9 @@ import { addBodyClass, isNative } from './hooks/useCapacitor'
 import { hasSeenOnboarding } from './services/storage'
 import { initDeepLinks } from './services/deepLinking'
 import SplashHandler from './SplashHandler'
+import NativeAppBar from './NativeAppBar'
+import NativeHomePage from './NativeHomePage'
+import FloatingCartBar from './FloatingCartBar'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
@@ -793,6 +796,10 @@ export default function App() {
   const noFooter = currentPage === 'admin' || currentPage === 'search' ||
                    currentPage === 'track' || currentPage === 'login'
 
+  // Pages where floating cart bar should NOT show
+  const noCartBar = currentPage === 'checkout' || currentPage === 'search' ||
+                    currentPage === 'track' || currentPage === 'login' || currentPage === 'admin'
+
   return (
     <AuthProvider>
       <AdminProvider>
@@ -802,17 +809,30 @@ export default function App() {
               {/* Splash screen manager (native only) */}
               <SplashHandler />
 
-              {!noHeader && <Header currentPage={currentPage} setCurrentPage={setCurrentPage} onAccountClick={goAccount} />}
+              {/* ── Header: Native App Bar vs Web Header ─── */}
+              {isNative ? (
+                <NativeAppBar
+                  onSearchClick={() => { window.location.hash = '#/search' }}
+                  onNotificationClick={() => {}}
+                />
+              ) : (
+                !noHeader && <Header currentPage={currentPage} setCurrentPage={setCurrentPage} onAccountClick={goAccount} />
+              )}
 
+              {/* ── Page Content ────────────────────────── */}
               {currentPage === 'home' ? (
-                <main>
-                  <Hero />
-                  <CinematicShowcase />
-                  <FeaturedCarousel />
-                  <MenuHighlights onViewFullMenu={goMenu} />
-                  <FarmToTandoor />
-                  <CTABanner />
-                </main>
+                isNative ? (
+                  <main><NativeHomePage onNavigate={handleNavigate} /></main>
+                ) : (
+                  <main>
+                    <Hero />
+                    <CinematicShowcase />
+                    <FeaturedCarousel />
+                    <MenuHighlights onViewFullMenu={goMenu} />
+                    <FarmToTandoor />
+                    <CTABanner />
+                  </main>
+                )
               ) : currentPage === 'menu' ? (
                 <main><MenuPage /></main>
               ) : currentPage === 'account' ? (
@@ -836,10 +856,18 @@ export default function App() {
               ) : currentPage === 'login' ? (
                 <OTPLoginPage onSuccess={() => { window.location.hash = '#/' }} />
               ) : (
-                <main><Hero /></main>
+                isNative ? (
+                  <main><NativeHomePage onNavigate={handleNavigate} /></main>
+                ) : (
+                  <main><Hero /></main>
+                )
               )}
 
-              {!noFooter && <Footer />}
+              {/* ── Floating Cart Bar (native only, above tab bar) ── */}
+              {isNative && !noCartBar && <FloatingCartBar />}
+
+              {/* ── Footer (web only) ──────────────────── */}
+              {!isNative && !noFooter && <Footer />}
             </LocationProvider>
           </CartProvider>
         </BlogProvider>
