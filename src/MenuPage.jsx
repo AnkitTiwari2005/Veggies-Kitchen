@@ -310,7 +310,9 @@ export default function MenuPage() {
       {!isSearching && (
         <nav className="menu-category-nav" aria-label="Menu categories">
           <div className="menu-category-nav-inner" ref={navRef}>
-            {menuSections.map((section) => (
+            {menuSections
+              .filter(section => !isNative || section.items.length > 0)
+              .map((section) => (
               <button
                 key={section.id}
                 className={`menu-category-pill ${activeSection === section.id ? 'active' : ''}`}
@@ -331,7 +333,9 @@ export default function MenuPage() {
         {isSearching ? (
           <SearchResults results={searchResults} query={searchQuery} />
         ) : (
-          menuSections.map((section) => (
+          menuSections
+            .filter(section => !isNative || section.items.length > 0)
+            .map((section) => (
             <MenuSectionBlock key={section.id} section={section} />
           ))
         )}

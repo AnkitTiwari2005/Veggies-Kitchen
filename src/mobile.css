@@ -1149,7 +1149,312 @@ body.is-native .native-page-back {
    NATIVE MENU PAGE OVERRIDES
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Sticky category tabs */
+/* Hide web hero and page background on native */
+body.is-native .menu-hero,
+body.is-native .menu-page > .page-bg {
+  display: none !important;
+}
+
+/* ── Sticky category nav (actual class from MenuPage.jsx) ──────── */
+body.is-native .menu-category-nav {
+  position: sticky;
+  top: calc(var(--safe-area-top) + var(--app-bar-height));
+  z-index: 100;
+  background: var(--native-bg);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 1px solid var(--native-border);
+  padding: 0 0;
+  margin: 0;
+}
+
+body.is-native .menu-category-nav-inner {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 10px 16px;
+  -webkit-overflow-scrolling: touch;
+  max-width: none;
+}
+
+body.is-native .menu-category-nav-inner::-webkit-scrollbar { display: none; }
+
+body.is-native .menu-category-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid var(--native-border);
+  background: var(--native-surface);
+  color: var(--native-text-secondary);
+  transition: all 200ms ease;
+  min-height: 32px;
+  flex-shrink: 0;
+}
+
+body.is-native .menu-category-pill .material-symbols-outlined {
+  font-size: 15px;
+}
+
+body.is-native .menu-category-pill.active {
+  background: var(--native-green);
+  color: white;
+  border-color: var(--native-green);
+}
+
+body.is-native .menu-category-pill.active .menu-category-pill-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+body.is-native .menu-category-pill-count {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+/* ── Menu content — tighter on native ──────────────────────────── */
+body.is-native .menu-content {
+  padding: 12px 16px 160px;
+}
+
+/* ── Section header — compact single-line on native ────────────── */
+body.is-native .menu-section-block {
+  margin-bottom: 24px;
+  scroll-margin-top: calc(var(--safe-area-top) + var(--app-bar-height) + 56px);
+}
+
+body.is-native .menu-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--native-border);
+}
+
+/* Hide the description text on native — wastes too much vertical space */
+body.is-native .menu-section-desc {
+  display: none !important;
+}
+
+/* Shrink the icon circle on native */
+body.is-native .menu-section-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+body.is-native .menu-section-icon .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--native-green);
+}
+
+/* Section title — smaller on native */
+body.is-native .menu-section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--native-text);
+  line-height: 1.3;
+}
+
+body.is-native .menu-section-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--native-text-secondary);
+  background: var(--native-surface-2);
+  padding: 2px 10px;
+  border-radius: 10px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ── Product cards — native horizontal layout ──────────────────── */
+body.is-native .product-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.is-native .product-card {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  padding: 12px;
+  background: var(--native-surface);
+  border: 1px solid var(--native-border);
+  border-radius: 12px;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: transform 200ms var(--spring-gentle);
+}
+
+body.is-native .product-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+body.is-native .product-card:active {
+  transform: scale(0.98);
+}
+
+body.is-native .product-card-image {
+  width: 90px;
+  min-height: 90px;
+  max-height: 90px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+body.is-native .product-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+body.is-native .product-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+body.is-native .product-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+body.is-native .product-card-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--native-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+body.is-native .product-card-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--native-text);
+  flex-shrink: 0;
+}
+
+body.is-native .product-card-desc {
+  font-size: 12px;
+  color: var(--native-text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+body.is-native .product-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+body.is-native .product-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+body.is-native .product-badge .material-symbols-outlined {
+  font-size: 12px;
+}
+
+/* ADD button — filled green on native */
+body.is-native .product-order-btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--native-green);
+  background: transparent;
+  color: var(--native-green);
+  font-size: 12px;
+  font-weight: 700;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  transition: all 150ms ease;
+  margin-left: auto;
+}
+
+body.is-native .product-order-btn .material-symbols-outlined {
+  font-size: 14px;
+}
+
+body.is-native .product-order-btn:active {
+  background: var(--native-green);
+  color: white;
+}
+
+/* Quantity stepper on menu cards */
+body.is-native .sp-stepper {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--native-green);
+  overflow: hidden;
+  min-height: 30px;
+}
+
+body.is-native .sp-stepper button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0;
+}
+
+body.is-native .sp-stepper button:active {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+body.is-native .sp-stepper span {
+  min-width: 24px;
+  text-align: center;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Hide the web floating CTA on native (we have FloatingCartBar) */
+body.is-native .menu-floating-cta {
+  display: none !important;
+}
+
+/* Hide back-to-top on native */
+body.is-native .menu-back-top {
+  bottom: calc(var(--tab-bar-height) + var(--cart-bar-height) + var(--safe-area-bottom) + 20px);
+}
+
+/* Legacy menu-category-tabs (unused but keeping for safety) */
 body.is-native .menu-category-tabs {
   position: sticky;
   top: calc(var(--safe-area-top) + var(--app-bar-height));
@@ -1190,197 +1495,6 @@ body.is-native .menu-category-tab.active {
   background: var(--native-green);
   color: white;
   border-color: var(--native-green);
-}
-
-/* Food cards — compact horizontal layout */
-body.is-native .food-card {
-  display: flex;
-  gap: 12px;
-  padding: 12px;
-  background: var(--native-surface);
-  border: 1px solid var(--native-border);
-  border-radius: 12px;
-  margin-bottom: 8px;
-  align-items: flex-start;
-  transition: transform 200ms var(--spring-gentle);
-}
-
-body.is-native .food-card:active {
-  transform: scale(0.98);
-}
-
-body.is-native .food-card__img {
-  width: 80px;
-  height: 80px;
-  border-radius: 10px;
-  object-fit: cover;
-  flex-shrink: 0;
-  background: var(--native-surface-2);
-}
-
-body.is-native .food-card__placeholder {
-  width: 80px;
-  height: 80px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-body.is-native .food-card__body {
-  flex: 1;
-  min-width: 0;
-}
-
-body.is-native .food-card__name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--native-text);
-  margin-bottom: 2px;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-body.is-native .food-card__desc {
-  font-size: 12px;
-  color: var(--native-text-secondary);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin-bottom: 6px;
-  line-height: 1.4;
-}
-
-body.is-native .food-card__badges {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 6px;
-}
-
-body.is-native .food-card__badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: 600;
-}
-
-body.is-native .food-card__badge--featured {
-  background: rgba(255, 179, 0, 0.12);
-  color: var(--native-gold);
-}
-
-body.is-native .food-card__badge--featured svg {
-  width: 10px;
-  height: 10px;
-  fill: var(--native-gold);
-}
-
-body.is-native .food-card__bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-body.is-native .food-card__price {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--native-text);
-}
-
-/* ADD button */
-body.is-native .food-card__add-btn {
-  height: 32px;
-  padding: 0 14px;
-  border-radius: 8px;
-  border: 1.5px solid var(--native-green);
-  background: transparent;
-  color: var(--native-green);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  min-height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 150ms ease;
-}
-
-body.is-native .food-card__add-btn:active {
-  background: var(--native-green);
-  color: white;
-}
-
-/* Quantity stepper */
-body.is-native .food-card__stepper {
-  display: flex;
-  align-items: center;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--native-green);
-  overflow: hidden;
-  min-height: 32px;
-}
-
-body.is-native .food-card__stepper-btn {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  color: white;
-  font-size: 18px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 32px;
-  padding: 0;
-}
-
-body.is-native .food-card__stepper-btn:active {
-  background: rgba(0, 0, 0, 0.15);
-}
-
-body.is-native .food-card__stepper-count {
-  min-width: 28px;
-  text-align: center;
-  color: white;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-/* Section headers in menu */
-body.is-native .native-menu-section-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 0 8px;
-  border-bottom: 1px solid var(--native-border);
-  margin-bottom: 12px;
-}
-
-body.is-native .native-menu-section-header svg {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
-body.is-native .native-menu-section-name {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--native-text);
-  flex: 1;
-}
-
-body.is-native .native-menu-section-count {
-  font-size: 12px;
-  color: var(--native-text-muted);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1431,6 +1545,143 @@ body.is-native .empty-state__cta {
 /* ═══════════════════════════════════════════════════════════════════
    CHECKOUT NATIVE OVERRIDES
    ═══════════════════════════════════════════════════════════════════ */
+
+/* Checkout page needs bottom padding for floating elements */
+body.is-native .checkout-page {
+  padding-bottom: 160px;
+}
+
+/* Hide web page background on native */
+body.is-native .checkout-page > .page-bg {
+  display: none !important;
+}
+
+/* Single-column layout on native */
+body.is-native .co-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 16px;
+}
+
+body.is-native .co-left,
+body.is-native .co-right {
+  width: 100%;
+}
+
+body.is-native .co-sticky {
+  position: static;
+}
+
+/* Panels — dark surface */
+body.is-native .co-panel {
+  background: var(--native-surface);
+  border: 1px solid var(--native-border);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+/* ── Place Order Button — BRIGHT GREEN (P0 fix) ────────────────── */
+body.is-native .co-place-order-btn {
+  width: 100%;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--native-green) !important;
+  color: white !important;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+}
+
+body.is-native .co-place-order-btn:active {
+  background: var(--native-green-dark) !important;
+  transform: scale(0.98);
+}
+
+body.is-native .co-place-order-btn:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+}
+
+body.is-native .co-place-order-btn .material-symbols-outlined {
+  font-size: 20px;
+  color: white;
+}
+
+/* Summary total line */
+body.is-native .co-total-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--native-green);
+}
+
+/* Cart item quantity controls */
+body.is-native .co-qty-controls {
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  background: var(--native-surface-2);
+  overflow: hidden;
+}
+
+body.is-native .co-qty-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--native-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0;
+}
+
+body.is-native .co-qty-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+body.is-native .co-qty-value {
+  min-width: 24px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--native-text);
+}
+
+/* Input fields */
+body.is-native .co-input,
+body.is-native .co-input-plain,
+body.is-native .co-textarea {
+  background: var(--native-surface-2);
+  border: 1px solid var(--native-border);
+  border-radius: 10px;
+  color: var(--native-text);
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+body.is-native .co-input:focus,
+body.is-native .co-input-plain:focus,
+body.is-native .co-textarea:focus {
+  border-color: var(--native-green);
+  outline: none;
+}
+
+body.is-native .co-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--native-text-secondary);
+  margin-bottom: 4px;
+}
+
+/* Sticky CTA (alternative checkout CTA) */
 body.is-native .checkout-sticky-cta {
   position: fixed;
   bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom));
