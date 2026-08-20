@@ -2,92 +2,146 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAdmin } from './AdminContext'
 import { useCart } from './CartContext'
 import { useAuth } from './AuthContext'
-import { VegBadge, PlusIcon } from './icons'
 import { lightTap } from './services/haptics'
+import DishDetailSheet from './DishDetailSheet'
+
+/* ── Inline SVGs — zero emojis ─────────────────────────────────── */
+const FireSVG = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="#FF5722">
+    <path d="M12 2C8 6 6 10 8 14c1 2 3 3 4 5 1-2 3-3 4-5 2-4 0-8-4-12z"/>
+    <path d="M12 10c-1 2-1 4 0 6 1-2 2-4 0-6z" fill="#FF9800"/>
+  </svg>
+)
+const StarSVG = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="#FFB300">
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+  </svg>
+)
+const VegDotSVG = () => (
+  <svg width="14" height="14" viewBox="0 0 18 18">
+    <rect x="1" y="1" width="16" height="16" rx="3" stroke="#4CAF50" strokeWidth="1.5" fill="none"/>
+    <circle cx="9" cy="9" r="4" fill="#4CAF50"/>
+  </svg>
+)
+const LeafSVG = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M17 8C8 10 5.9 16.17 3.82 19.99a.5.5 0 0 0 .7.65c.96-.51 2.57-1.39 4.21-1.39C15 19.25 19 13 19 9c0-5-5-7-5-7s2 1 3 6z" fill="#4CAF50"/>
+  </svg>
+)
+const DeliverySVG = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3" stroke="#4CAF50" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M9 17h6m4 0h2M13 17v-4a2 2 0 012-2h3l3 4v2" stroke="#4CAF50" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <circle cx="7.5" cy="17.5" r="1.5" fill="#4CAF50"/>
+    <circle cx="17.5" cy="17.5" r="1.5" fill="#4CAF50"/>
+  </svg>
+)
+const ShieldSVG = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="rgba(76,175,80,0.15)" stroke="#4CAF50" strokeWidth="1.5" strokeLinejoin="round"/>
+    <path d="M9 12l2 2 4-4" stroke="#4CAF50" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+const TandoorSVG = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <ellipse cx="12" cy="17" rx="8" ry="4" fill="rgba(255,87,34,0.15)" stroke="#FF5722" strokeWidth="1.5"/>
+    <path d="M8 17V9a4 4 0 018 0v8" stroke="#FF5722" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M10 9c0-2 4-4 4-7" stroke="#FF9800" strokeWidth="1.3" strokeLinecap="round"/>
+    <path d="M13 10c0-1.5 2-2.5 2-5" stroke="#FF9800" strokeWidth="1" strokeLinecap="round"/>
+  </svg>
+)
+
+// Banner SVG icons (replace emojis)
+const RocketSVG = () => (
+  <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+    <path d="M12 2C12 2 6 6 6 13l3 1 .5 3h5l.5-3 3-1c0-7-6-11-6-11z" fill="rgba(255,255,255,0.9)"/>
+    <path d="M9 14c-1 .5-2 2-2 4" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M15 14c1 .5 2 2 2 4" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" strokeLinecap="round"/>
+    <circle cx="12" cy="10" r="2" fill="rgba(255,255,255,0.5)"/>
+  </svg>
+)
+const OrganicSVG = () => (
+  <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+    <path d="M17 8C8 10 5.9 16.17 3.82 19.99a.5.5 0 00.7.65c.96-.51 2.57-1.39 4.21-1.39C15 19.25 19 13 19 9c0-5-5-7-5-7s2 1 3 6z" fill="rgba(255,255,255,0.9)"/>
+  </svg>
+)
+const DealSVG = () => (
+  <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+    <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z" fill="rgba(255,255,255,0.9)"/>
+  </svg>
+)
+
+const BANNERS = [
+  { title: 'Free Delivery', subtitle: 'On orders above ₹300', cta: 'Order Now', gradient: 'linear-gradient(135deg, #1B5E20, #388E3C)', Icon: RocketSVG },
+  { title: 'Fresh & Organic', subtitle: 'Farm-fresh veggies daily', cta: 'Explore Menu', gradient: 'linear-gradient(135deg, #E65100, #F57C00)', Icon: OrganicSVG },
+  { title: 'Value Combos', subtitle: 'Save up to 30% on combos', cta: 'View Deals', gradient: 'linear-gradient(135deg, #4A148C, #7B1FA2)', Icon: DealSVG },
+]
 
 export default function NativeHomePage({ onNavigate }) {
   const { menuSections } = useAdmin()
-  const { addToCart } = useCart()
-  const { user } = useAuth()
+  const { addToCart, cartItems, updateQuantity } = useCart()
   const [bannerIndex, setBannerIndex] = useState(0)
-  const bannerRef = useRef(null)
+  const [selectedDish, setSelectedDish] = useState(null)
   const bannerTimerRef = useRef(null)
+  const containerRef = useRef(null)
+  // Scroll memory — restore position when returning to home
+  const SCROLL_KEY = 'nh_scroll_y'
 
   const allItems = menuSections.flatMap(s => s.items || [])
   const popularItems = allItems.filter(i => i.featured && i.image).slice(0, 10)
   const specialItems = allItems.filter(i => i.image).slice(0, 8)
   const categories = menuSections.filter(s => s.items && s.items.length > 0)
 
-  // Get a representative image for each category
-  const getCategoryImage = (section) => {
-    const withImage = section.items.find(i => i.image)
-    return withImage ? withImage.image : null
-  }
+  const getCategoryImage = (section) => section.items.find(i => i.image)?.image || null
 
-  // Promo banners
-  const banners = [
-    {
-      title: 'Free Delivery',
-      subtitle: 'On orders above ₹300',
-      cta: 'Order Now',
-      gradient: 'linear-gradient(135deg, #1B5E20 0%, #388E3C 50%, #2E7D32 100%)',
-      icon: '🚀'
-    },
-    {
-      title: 'Fresh & Organic',
-      subtitle: 'Farm-fresh veggies every morning',
-      cta: 'Explore Menu',
-      gradient: 'linear-gradient(135deg, #E65100 0%, #F57C00 50%, #FF9800 100%)',
-      icon: '🌿'
-    },
-    {
-      title: 'Value Combos',
-      subtitle: 'Save up to 30% on meal combos',
-      cta: 'View Deals',
-      gradient: 'linear-gradient(135deg, #4A148C 0%, #7B1FA2 50%, #9C27B0 100%)',
-      icon: '💰'
-    },
-  ]
-
-  // Auto-scroll banners
+  // Restore scroll position
   useEffect(() => {
+    const saved = sessionStorage.getItem(SCROLL_KEY)
+    if (saved) {
+      requestAnimationFrame(() => window.scrollTo({ top: parseInt(saved, 10), behavior: 'instant' }))
+    }
+    return () => {
+      sessionStorage.setItem(SCROLL_KEY, String(window.scrollY))
+    }
+  }, [])
+
+  // Auto-advance banner using CSS transform (no scrollIntoView)
+  const startTimer = useCallback(() => {
+    clearInterval(bannerTimerRef.current)
     bannerTimerRef.current = setInterval(() => {
-      setBannerIndex(prev => (prev + 1) % banners.length)
+      setBannerIndex(prev => (prev + 1) % BANNERS.length)
     }, 4000)
-    return () => clearInterval(bannerTimerRef.current)
-  }, [banners.length])
+  }, [])
 
   useEffect(() => {
-    if (bannerRef.current) {
-      const cards = bannerRef.current.children
-      if (cards[bannerIndex]) {
-        cards[bannerIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-      }
-    }
-  }, [bannerIndex])
+    startTimer()
+    return () => clearInterval(bannerTimerRef.current)
+  }, [startTimer])
 
-  const handleBannerScroll = useCallback(() => {
-    if (!bannerRef.current) return
-    const scrollLeft = bannerRef.current.scrollLeft
-    const cardWidth = bannerRef.current.children[0]?.offsetWidth || 300
-    const newIndex = Math.round(scrollLeft / (cardWidth + 12))
-    if (newIndex !== bannerIndex && newIndex >= 0 && newIndex < banners.length) {
-      setBannerIndex(newIndex)
-      clearInterval(bannerTimerRef.current)
-      bannerTimerRef.current = setInterval(() => {
-        setBannerIndex(prev => (prev + 1) % banners.length)
-      }, 4000)
+  // Touch-swipe on banner
+  const touchStartX = useRef(0)
+  const handleBannerTouchStart = (e) => { touchStartX.current = e.touches[0].clientX }
+  const handleBannerTouchEnd = (e) => {
+    const diff = touchStartX.current - e.changedTouches[0].clientX
+    if (Math.abs(diff) > 40) {
+      setBannerIndex(prev =>
+        diff > 0
+          ? (prev + 1) % BANNERS.length
+          : (prev - 1 + BANNERS.length) % BANNERS.length
+      )
+      startTimer()
     }
-  }, [bannerIndex, banners.length])
+  }
 
   const handleAddToCart = (item, e) => {
     if (e) e.stopPropagation()
-    addToCart(item)
     lightTap()
+    addToCart(item)
   }
 
-  const goToMenu = () => { window.location.hash = '#/menu' }
-  const goToSearch = () => { window.location.hash = '#/search' }
+  const inCart = (item) => cartItems?.find(i => i.name === item.name)?.quantity || 0
+
+  const goToMenu = () => { lightTap(); window.location.hash = '#/menu' }
 
   const goToCategoryInMenu = (sectionId) => {
     lightTap()
@@ -95,42 +149,51 @@ export default function NativeHomePage({ onNavigate }) {
     setTimeout(() => {
       const el = document.getElementById(`section-${sectionId}`)
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 300)
+    }, 350)
   }
 
   return (
-    <div className="nh">
-      {/* ── Search Bar ───────────────────────────────── */}
-      <div className="nh-search" onClick={goToSearch}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2.5" strokeLinecap="round">
-          <circle cx="11" cy="11" r="7"/>
-          <line x1="20" y1="20" x2="15.8" y2="15.8"/>
-        </svg>
-        <span>Search for dishes, cuisines...</span>
-      </div>
+    <div className="nh" ref={containerRef}>
 
-      {/* ── Promo Banners ────────────────────────────── */}
-      <div className="nh-banners" ref={bannerRef} onScroll={handleBannerScroll}>
-        {banners.map((b, i) => (
-          <div key={i} className="nh-banner" style={{ background: b.gradient }} onClick={goToMenu}>
-            <div className="nh-banner__content">
-              <span className="nh-banner__icon">{b.icon}</span>
-              <h3 className="nh-banner__title">{b.title}</h3>
-              <p className="nh-banner__sub">{b.subtitle}</p>
+      {/* ── Promo Banners — CSS transform based (no scrollIntoView bug) ── */}
+      <div
+        className="nh-banners"
+        onTouchStart={handleBannerTouchStart}
+        onTouchEnd={handleBannerTouchEnd}
+      >
+        <div
+          className="nh-banners__track"
+          style={{ transform: `translateX(-${bannerIndex * 100}%)` }}
+        >
+          {BANNERS.map((b, i) => (
+            <div key={i} className="nh-banner" style={{ background: b.gradient }} onClick={goToMenu}>
+              <div className="nh-banner__content">
+                <b.Icon />
+                <div>
+                  <h3 className="nh-banner__title">{b.title}</h3>
+                  <p className="nh-banner__sub">{b.subtitle}</p>
+                </div>
+              </div>
+              <button className="nh-banner__cta">{b.cta} →</button>
             </div>
-            <button className="nh-banner__cta">{b.cta} →</button>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* Banner dots */}
+      {/* Dots */}
       <div className="nh-dots">
-        {banners.map((_, i) => (
-          <span key={i} className={`nh-dot${i === bannerIndex ? ' active' : ''}`} onClick={() => setBannerIndex(i)} />
+        {BANNERS.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            className={`nh-dot${i === bannerIndex ? ' active' : ''}`}
+            onClick={() => { setBannerIndex(i); startTimer() }}
+            aria-label={`Banner ${i + 1}`}
+          />
         ))}
       </div>
 
-      {/* ── Categories (real food images in circles) ── */}
+      {/* ── Categories ─────────────────────────────────── */}
       {categories.length > 0 && (
         <div className="nh-section">
           <h2 className="nh-section__title">What's on your mind?</h2>
@@ -140,13 +203,10 @@ export default function NativeHomePage({ onNavigate }) {
               return (
                 <div key={cat.id} className="nh-cat" onClick={() => goToCategoryInMenu(cat.id)}>
                   <div className="nh-cat__circle">
-                    {img ? (
-                      <img src={img} alt={cat.name} loading="lazy" />
-                    ) : (
-                      <span className="nh-cat__emoji">
-                        <span className="material-symbols-outlined">{cat.icon}</span>
-                      </span>
-                    )}
+                    {img
+                      ? <img src={img} alt={cat.name} loading="lazy" />
+                      : <span className="material-symbols-outlined" style={{color:'#4CAF50'}}>{cat.icon}</span>
+                    }
                   </div>
                   <span className="nh-cat__name">{cat.name}</span>
                 </div>
@@ -156,94 +216,120 @@ export default function NativeHomePage({ onNavigate }) {
         </div>
       )}
 
-      {/* ── Popular Right Now ────────────────────────── */}
+      {/* ── Popular Right Now ───────────────────────────── */}
       {popularItems.length > 0 && (
         <div className="nh-section">
           <div className="nh-section__header">
-            <h2 className="nh-section__title">🔥 Popular Right Now</h2>
+            <h2 className="nh-section__title">
+              <FireSVG />
+              Popular Right Now
+            </h2>
             <span className="nh-section__link" onClick={goToMenu}>See All ›</span>
           </div>
           <div className="nh-hscroll">
-            {popularItems.map((item, idx) => (
-              <div key={`pop-${idx}`} className="nh-pcard">
-                <div className="nh-pcard__imgwrap">
-                  <img src={item.image} alt={item.name} loading="lazy" />
-                  {item.featured && <span className="nh-pcard__badge">⭐ Chef's Pick</span>}
-                </div>
-                <div className="nh-pcard__body">
-                  <span className="nh-pcard__name">{item.name}</span>
-                  <div className="nh-pcard__row">
-                    <span className="nh-pcard__price">₹{item.price}</span>
-                    <button className="nh-addbtn" onClick={(e) => handleAddToCart(item, e)}>
-                      ADD
-                    </button>
+            {popularItems.map((item, idx) => {
+              const qty = inCart(item)
+              return (
+                <div key={`pop-${idx}`} className="nh-pcard" onClick={() => setSelectedDish(item)}>
+                  <div className="nh-pcard__imgwrap">
+                    <img src={item.image} alt={item.name} loading="lazy" />
+                    {item.featured && (
+                      <span className="nh-pcard__badge">
+                        <StarSVG /> Chef's Pick
+                      </span>
+                    )}
+                  </div>
+                  <div className="nh-pcard__body">
+                    <span className="nh-pcard__name">{item.name}</span>
+                    <div className="nh-pcard__row">
+                      <span className="nh-pcard__price">₹{item.price}</span>
+                      {qty > 0 ? (
+                        <div className="nh-mini-stepper" onClick={e => e.stopPropagation()}>
+                          <button type="button" onClick={() => { lightTap(); updateQuantity(item.name, -1) }}>−</button>
+                          <span>{qty}</span>
+                          <button type="button" onClick={() => { lightTap(); updateQuantity(item.name, 1) }}>+</button>
+                        </div>
+                      ) : (
+                        <button className="nh-addbtn" onClick={(e) => handleAddToCart(item, e)}>ADD</button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}
 
-      {/* ── Today's Specials (vertical cards) ────────── */}
+      {/* ── Today's Specials ─────────────────────────────── */}
       {specialItems.length > 0 && (
         <div className="nh-section">
           <div className="nh-section__header">
-            <h2 className="nh-section__title">⭐ Today's Specials</h2>
+            <h2 className="nh-section__title">
+              <StarSVG />
+              Today's Specials
+            </h2>
             <span className="nh-section__link" onClick={goToMenu}>Full Menu ›</span>
           </div>
           <div className="nh-specials">
-            {specialItems.map((item, idx) => (
-              <div key={`spec-${idx}`} className="nh-scard">
-                <img src={item.image} alt={item.name} className="nh-scard__img" loading="lazy" />
-                <div className="nh-scard__info">
-                  <div className="nh-scard__top">
-                    <VegBadge size={14} />
-                    <span className="nh-scard__name">{item.name}</span>
-                  </div>
-                  {item.description && (
-                    <p className="nh-scard__desc">{item.description}</p>
-                  )}
-                  <div className="nh-scard__bottom">
-                    <span className="nh-scard__price">₹{item.price}</span>
-                    <button className="nh-addbtn" onClick={(e) => handleAddToCart(item, e)}>
-                      ADD
-                    </button>
+            {specialItems.map((item, idx) => {
+              const qty = inCart(item)
+              return (
+                <div key={`spec-${idx}`} className="nh-scard" onClick={() => setSelectedDish(item)}>
+                  <img src={item.image} alt={item.name} className="nh-scard__img" loading="lazy" />
+                  <div className="nh-scard__info">
+                    <div className="nh-scard__top">
+                      <VegDotSVG />
+                      <span className="nh-scard__name">{item.name}</span>
+                      <span className="nh-scard__price">₹{item.price}</span>
+                    </div>
+                    {item.description && (
+                      <p className="nh-scard__desc">{item.description}</p>
+                    )}
+                    {item.featured && (
+                      <span className="nh-scard__chefs">
+                        <StarSVG /> Chef's Pick
+                      </span>
+                    )}
+                    <div className="nh-scard__bottom">
+                      {qty > 0 ? (
+                        <div className="nh-mini-stepper" onClick={e => e.stopPropagation()}>
+                          <button type="button" onClick={() => { lightTap(); updateQuantity(item.name, -1) }}>−</button>
+                          <span>{qty}</span>
+                          <button type="button" onClick={() => { lightTap(); updateQuantity(item.name, 1) }}>+</button>
+                        </div>
+                      ) : (
+                        <button className="nh-addbtn" onClick={(e) => handleAddToCart(item, e)}>ADD</button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}
 
-      {/* ── Trust / About ────────────────────────────── */}
+      {/* ── Trust Badges ─────────────────────────────────── */}
       <div className="nh-trust">
         <div className="nh-trust__header">
-          <VegBadge size={18} />
+          <LeafSVG />
           <span>100% Pure Vegetarian</span>
         </div>
         <div className="nh-trust__grid">
-          <div className="nh-trust__item">
-            <span className="material-symbols-outlined" style={{ color: '#4CAF50', fontSize: 20 }}>eco</span>
-            <span>Farm Fresh Daily</span>
-          </div>
-          <div className="nh-trust__item">
-            <span className="material-symbols-outlined" style={{ color: '#4CAF50', fontSize: 20 }}>verified</span>
-            <span>No Preservatives</span>
-          </div>
-          <div className="nh-trust__item">
-            <span className="material-symbols-outlined" style={{ color: '#4CAF50', fontSize: 20 }}>local_fire_department</span>
-            <span>Clay Tandoor</span>
-          </div>
-          <div className="nh-trust__item">
-            <span className="material-symbols-outlined" style={{ color: '#4CAF50', fontSize: 20 }}>delivery_dining</span>
-            <span>Swift Delivery</span>
-          </div>
+          <div className="nh-trust__item"><LeafSVG /><span>Farm Fresh Daily</span></div>
+          <div className="nh-trust__item"><ShieldSVG /><span>No Preservatives</span></div>
+          <div className="nh-trust__item"><TandoorSVG /><span>Clay Tandoor</span></div>
+          <div className="nh-trust__item"><DeliverySVG /><span>Swift Delivery</span></div>
         </div>
       </div>
 
-      <div style={{ height: 80 }} />
+      <div style={{ height: 120 }} />
+
+      {/* Dish Detail Sheet */}
+      {selectedDish && (
+        <DishDetailSheet item={selectedDish} onClose={() => setSelectedDish(null)} />
+      )}
     </div>
   )
 }

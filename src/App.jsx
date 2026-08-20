@@ -11,6 +11,7 @@ import { addBodyClass, isNative } from './hooks/useCapacitor'
 import { hasSeenOnboarding } from './services/storage'
 import { initDeepLinks } from './services/deepLinking'
 import SplashHandler from './SplashHandler'
+import SplashOverlay from './SplashOverlay'
 import NativeAppBar from './NativeAppBar'
 import NativeHomePage from './NativeHomePage'
 import FloatingCartBar from './FloatingCartBar'
@@ -626,6 +627,7 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState('home')
   const [trackingOrderId, setTrackingOrderId] = useState(null)
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showSplash, setShowSplash] = useState(isNative)
 
   /* ── Native startup: body classes, onboarding check ────────────────────── */
   useEffect(() => {
@@ -761,6 +763,11 @@ export default function App() {
     }
   }
 
+  /* ── Splash overlay (shows on every cold start, native only) ───────────── */
+  if (showSplash) {
+    return <SplashOverlay onDone={() => setShowSplash(false)} />
+  }
+
   /* ── Onboarding overlay ─────────────────────────────────────────────────── */
   if (showOnboarding) {
     return <OnboardingCarousel onComplete={() => setShowOnboarding(false)} />
@@ -771,8 +778,10 @@ export default function App() {
   const noFooter = currentPage === 'admin' || currentPage === 'search' ||
                    currentPage === 'track' || currentPage === 'login'
 
+  // 3-tab nav: hide on full-screen flows; checkout handled by floating cart bar
   const hideBottomNav = currentPage === 'search' || currentPage === 'track' ||
-                        currentPage === 'login' || currentPage === 'admin' || currentPage === 'write-blog'
+                        currentPage === 'login' || currentPage === 'admin' ||
+                        currentPage === 'write-blog' || currentPage === 'checkout'
 
   // Pages where floating cart bar should NOT show
   const noCartBar = currentPage === 'checkout' || currentPage === 'search' ||
@@ -784,7 +793,7 @@ export default function App() {
         <BlogProvider>
           <CartProvider>
             <LocationProvider>
-              {/* Splash screen manager (native only) */}
+              {/* Splash screen manager (hides native Capacitor splash) */}
               <SplashHandler />
 
               {/* Location selection modal */}

@@ -218,12 +218,12 @@ export default function CheckoutPage() {
         {/* ═══ LEFT COLUMN: Cart + Recommendations ═══ */}
         <div className="co-left">
 
-          {/* ── Cart Items ── */}
+          {/* ── Cart Items — compact Zomato-style ── */}
           <div className="co-panel co-cart-panel">
             <h2 className="co-panel-title">
               <span className="material-symbols-outlined co-icon-accent">restaurant</span>
-              Your Selection
-              {cartCount > 0 && <span className="co-item-count">{cartCount} items</span>}
+              Your Order
+              {cartCount > 0 && <span className="co-item-count">{cartCount} item{cartCount !== 1 ? 's' : ''}</span>}
             </h2>
 
             {cartItems.length === 0 ? (
@@ -235,46 +235,69 @@ export default function CheckoutPage() {
             ) : (
               <div className="co-items-list">
                 {cartItems.map((item, idx) => (
-                  <div key={item.name} className={`co-cart-item ${idx > 0 ? 'co-cart-item-border' : ''}`}>
-                    <div className="co-cart-item-img">
-                      {item.image ? (
-                        <img src={item.image} alt={item.name} loading="lazy" />
-                      ) : (
-                        <div className="co-cart-item-emoji">
-                          {SECTION_EMOJI[item.sectionId] || '🍽️'}
-                        </div>
+                  <div key={item.name} className={`co-compact-row${idx > 0 ? ' co-compact-row--border' : ''}`}>
+                    {/* Veg dot */}
+                    <svg width="14" height="14" viewBox="0 0 18 18" style={{flexShrink:0}}>
+                      <rect x="1" y="1" width="16" height="16" rx="3" stroke="#4CAF50" strokeWidth="1.5" fill="none"/>
+                      <circle cx="9" cy="9" r="4" fill="#4CAF50"/>
+                    </svg>
+
+                    {/* Name + customization note */}
+                    <div className="co-compact-name-col">
+                      <span className="co-compact-name">{item.name}</span>
+                      {item.spiceLevel && item.spiceLevel !== 'Medium' && (
+                        <span className="co-compact-custom">{item.spiceLevel}</span>
+                      )}
+                      {item.cookingNote && (
+                        <span className="co-compact-custom">{item.cookingNote}</span>
                       )}
                     </div>
-                    <div className="co-cart-item-info">
-                      <h3 className="co-cart-item-name">{item.name}</h3>
-                      {item.description && (
-                        <p className="co-cart-item-desc">
-                          {item.description.length > 60
-                            ? item.description.substring(0, 60) + '…'
-                            : item.description}
-                        </p>
-                      )}
-                      <div className="co-cart-item-price">₹{item.price}</div>
-                    </div>
-                    <div className="co-cart-item-actions">
-                      <div className="co-qty-controls">
-                        <button className="co-qty-btn" onClick={() => updateQuantity(item.name, -1)} aria-label="Decrease quantity">
-                          <span className="material-symbols-outlined">remove</span>
-                        </button>
-                        <span className="co-qty-value">{item.quantity}</span>
-                        <button className="co-qty-btn co-qty-btn-add" onClick={() => updateQuantity(item.name, 1)} aria-label="Increase quantity">
-                          <span className="material-symbols-outlined">add</span>
-                        </button>
-                      </div>
-                      <button className="co-remove-btn" onClick={() => removeFromCart(item.name)} aria-label="Remove item">
-                        <span className="material-symbols-outlined">delete_outline</span>
+
+                    {/* Inline stepper */}
+                    <div className="co-compact-stepper">
+                      <button
+                        type="button"
+                        className="co-compact-btn"
+                        onClick={() => updateQuantity(item.name, -1)}
+                        aria-label="Decrease"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                          <path d="M5 12h14" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                        </svg>
+                      </button>
+                      <span className="co-compact-qty">{item.quantity}</span>
+                      <button
+                        type="button"
+                        className="co-compact-btn"
+                        onClick={() => updateQuantity(item.name, 1)}
+                        aria-label="Increase"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                          <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                        </svg>
                       </button>
                     </div>
+
+                    {/* Price */}
+                    <span className="co-compact-price">₹{(item.price * item.quantity).toFixed(0)}</span>
+
+                    {/* Remove */}
+                    <button
+                      type="button"
+                      className="co-compact-remove"
+                      onClick={() => removeFromCart(item.name)}
+                      aria-label="Remove"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="#666" strokeWidth="2" strokeLinecap="round"/>
+                      </svg>
+                    </button>
                   </div>
                 ))}
               </div>
             )}
           </div>
+
 
           {/* ── Recommendations ── */}
           {cartItems.length > 0 && recommendations.length > 0 && (

@@ -1,0 +1,108 @@
+/* ═══════════════════════════════════════════════════════════════
+   JS SPLASH OVERLAY
+   ═══════════════════════════════════════════════════════════════ */
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #0a0a0a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+}
+
+/* Phase: in */
+.splash-overlay--in .splash-logo {
+  opacity: 0;
+  transform: scale(0.7) translateY(10px);
+  animation: splashLogoIn 500ms 100ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.splash-overlay--in .splash-dots {
+  opacity: 0;
+  animation: splashFadeIn 300ms 500ms ease forwards;
+}
+
+/* Phase: hold */
+.splash-overlay--hold .splash-logo { opacity: 1; transform: scale(1); }
+.splash-overlay--hold .splash-dots { opacity: 1; }
+
+/* Phase: out */
+.splash-overlay--out {
+  animation: splashFadeOut 250ms ease forwards;
+}
+
+@keyframes splashLogoIn {
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes splashFadeIn {
+  to { opacity: 1; }
+}
+@keyframes splashFadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
+
+/* Logo */
+.splash-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+/* Leaf SVG bounce */
+.splash-leaf {
+  animation: splashLeafBounce 1.5s ease-in-out infinite;
+}
+@keyframes splashLeafBounce {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%       { transform: translateY(-8px) rotate(3deg); }
+}
+
+/* Brand name */
+.splash-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.splash-brand-main {
+  font-size: 34px;
+  font-weight: 800;
+  color: #4CAF50;
+  letter-spacing: -0.5px;
+}
+.splash-brand-sub {
+  font-size: 28px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.8);
+  letter-spacing: 0.5px;
+}
+
+/* Tagline */
+.splash-tagline {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Loading dots */
+.splash-dots {
+  display: flex;
+  gap: 8px;
+  transition: opacity 200ms ease;
+}
+.splash-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4CAF50;
+  animation: splashDotPulse 900ms ease-in-out infinite;
+  opacity: 0.4;
+}
+@keyframes splashDotPulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.9); }
+  50%       { opacity: 1;   transform: scale(1.2); }
+}
