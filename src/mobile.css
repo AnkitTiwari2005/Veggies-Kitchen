@@ -40,7 +40,7 @@
   --native-gold: #FFB300;
 
   /* Layout */
-  --app-bar-height: 88px;   /* 2-row bar: 44px location + 44px search */
+  --app-bar-height: 104px;  /* 2-row bar: ~46px location row + ~58px search row */
   --tab-bar-height: 56px;
   --cart-bar-height: 48px;
 }
@@ -2375,12 +2375,14 @@ body.is-native .checkout-card {
   gap: 2px;
 }
 .co-compact-name {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--native-text, #f0f0f0);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.35;
 }
 .co-compact-custom {
   font-size: 11px;

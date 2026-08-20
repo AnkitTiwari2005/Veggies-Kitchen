@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useCart } from './CartContext'
 import { useLocation } from './LocationContext'
 import { SECTION_EMOJI } from './menuData'
@@ -109,6 +109,57 @@ export default function CheckoutPage() {
     [cartItems, menuSections]
   )
 
+  /* ── Saved address book ──────────────── */
+  const [savedAddresses, setSavedAddresses] = useState([])
+  const [selectedAddrIdx, setSelectedAddrIdx] = useState(null) // null = new address
+  const [saveAddress, setSaveAddress] = useState(false)
+  const [newAddrLabel, setNewAddrLabel] = useState('Home')
+
+  // Load saved addresses on mount
+  useEffect(() => {
+    const load = async () => {
+      try {
+        if (isNative) {
+          const { Preferences } = await import('@capacitor/preferences')
+          const { value } = await Preferences.get({ key: 'vk_saved_addresses' })
+          if (value) setSavedAddresses(JSON.parse(value))
+        } else {
+          const raw = localStorage.getItem('vk_saved_addresses')
+          if (raw) setSavedAddresses(JSON.parse(raw))
+        }
+      } catch {}
+    }
+    load()
+  }, [])
+
+  // When user picks a saved address, fill in the form
+  useEffect(() => {
+    if (selectedAddrIdx !== null && savedAddresses[selectedAddrIdx]) {
+      const a = savedAddresses[selectedAddrIdx]
+      setDeliveryForm(prev => ({
+        ...prev,
+        street: a.street || '',
+        city: a.city || '',
+        state: a.state || '',
+        pincode: a.pincode || '',
+        phone: a.phone || prev.phone,
+        name: a.name || prev.name,
+      }))
+    }
+  }, [selectedAddrIdx])
+
+  const persistAddresses = useCallback(async (list) => {
+    try {
+      const json = JSON.stringify(list)
+      if (isNative) {
+        const { Preferences } = await import('@capacitor/preferences')
+        await Preferences.set({ key: 'vk_saved_addresses', value: json })
+      } else {
+        localStorage.setItem('vk_saved_addresses', json)
+      }
+    } catch {}
+  }, [])
+
   /* ── Validation ─────────────────────── */
   const activeForm = orderForOther ? recipientForm : deliveryForm
   const isFormValid = useMemo(() => {
@@ -132,7 +183,7 @@ export default function CheckoutPage() {
     
     try {
       const orderPayload = {
-        isGuest: !orderForOther, // If orderForOther is false and we have no user context, we rely on the backend to set user if authenticated
+        isGuest: !orderForOther,
         customerName: activeForm.name,
         customerEmail: activeForm.email,
         customerPhone: activeForm.phone,
@@ -160,6 +211,22 @@ export default function CheckoutPage() {
 
       if (res.ok) {
         const orderData = await res.json()
+
+        // Save address if requested
+        if (saveAddress && !orderForOther && selectedAddrIdx === null) {
+          const newAddr = {
+            label: newAddrLabel,
+            name: deliveryForm.name,
+            phone: deliveryForm.phone,
+            street: deliveryForm.street,
+            city: deliveryForm.city,
+            state: deliveryForm.state,
+            pincode: deliveryForm.pincode,
+          }
+          const updated = [...savedAddresses, newAddr]
+          setSavedAddresses(updated)
+          await persistAddresses(updated)
+        }
         
         let message = `Hi Veggie Kitchen! 🥦\n\nI have just placed a new order from your website! Here are my details:\n\n`
         message += `*Order ID:* #${orderData._id.slice(-6).toUpperCase()}\n`
@@ -338,25 +405,58 @@ export default function CheckoutPage() {
             {/* ── Delivery Details ── */}
             <div className="co-panel co-delivery-panel">
               <h2 className="co-panel-title">
-                <span className="material-symbols-outlined co-icon-accent">location_on</span>
-                Delivery Details
-                {locationStatus === 'detected' && (
-                  <span className="co-location-badge co-badge-detected">
-                    <span className="material-symbols-outlined" style={{ fontSize: 14 }}>my_location</span>
-                    Auto-detected
-                  </span>
-                )}
-                {locationStatus === 'detecting' && (
-                  <span className="co-location-badge co-badge-detecting">Detecting…</span>
-                )}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{flexShrink:0}}>
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#4CAF50"/>
+                </svg>
+                Delivery Address
               </h2>
 
-              <div className="payment-method-container" style={{ marginTop: '24px', padding: '16px', background: 'var(--surface)', borderRadius: '8px', border: '1px solid var(--outline-variant)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <span className="material-symbols-outlined text-secondary">payments</span>
-                  <h3 className="text-body-lg text-primary font-semibold">Payment Method</h3>
+              {/* ── Saved address pills ── */}
+              {!orderForOther && savedAddresses.length > 0 && (
+                <div className="co-addr-pills">
+                  {savedAddresses.map((a, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      className={`co-addr-pill${selectedAddrIdx === i ? ' co-addr-pill--active' : ''}`}
+                      onClick={() => setSelectedAddrIdx(selectedAddrIdx === i ? null : i)}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill={selectedAddrIdx === i ? 'white' : '#4CAF50'}/>
+                      </svg>
+                      {a.label || `Address ${i + 1}`}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className={`co-addr-pill${selectedAddrIdx === null ? ' co-addr-pill--active' : ''}`}
+                    onClick={() => { setSelectedAddrIdx(null); setDeliveryForm(f => ({...f, street:'', city:'', state:'', pincode:''})) }}
+                  >
+                    + New Address
+                  </button>
                 </div>
-                <p className="text-body-md text-on-surface-variant">Cash on Delivery (COD) is selected by default.</p>
+              )}
+
+              {/* Selected address summary */}
+              {selectedAddrIdx !== null && savedAddresses[selectedAddrIdx] && (
+                <div className="co-addr-selected">
+                  <span className="co-addr-selected-text">
+                    {savedAddresses[selectedAddrIdx].street}, {savedAddresses[selectedAddrIdx].city} — {savedAddresses[selectedAddrIdx].pincode}
+                  </span>
+                  <button type="button" className="co-addr-edit-btn" onClick={() => setSelectedAddrIdx(null)}>
+                    Change
+                  </button>
+                </div>
+              )}
+
+              {/* COD badge */}
+              <div className="co-cod-row">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <rect x="2" y="6" width="20" height="14" rx="2" stroke="#4CAF50" strokeWidth="1.5" fill="none"/>
+                  <path d="M2 10h20" stroke="#4CAF50" strokeWidth="1.5"/>
+                </svg>
+                <span>Cash on Delivery</span>
+                <span className="co-cod-badge">COD</span>
               </div>
 
               {/* Delivery time */}
@@ -365,176 +465,155 @@ export default function CheckoutPage() {
                   className={`co-time-btn ${deliveryTime === 'now' ? 'co-time-active' : ''}`}
                   onClick={() => setDeliveryTime('now')}
                 >
-                  <span className="material-symbols-outlined">schedule</span> Now (30-45m)
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/>
+                    <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                  Now (30-45m)
                 </button>
                 <button
                   className={`co-time-btn ${deliveryTime === 'schedule' ? 'co-time-active' : ''}`}
                   onClick={() => setDeliveryTime('schedule')}
                 >
-                  <span className="material-symbols-outlined">calendar_month</span> Schedule
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+                    <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                  Schedule
                 </button>
               </div>
 
-              {/* Order for toggle */}
+              {/* Order for other toggle */}
               <label className="co-toggle-row">
-                <input
-                  type="checkbox"
-                  checked={orderForOther}
-                  onChange={(e) => setOrderForOther(e.target.checked)}
-                />
+                <input type="checkbox" checked={orderForOther} onChange={(e) => setOrderForOther(e.target.checked)} />
                 <span className="co-toggle-label">
-                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>person_add</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="1.5"/>
+                    <path d="M3 21c0-4 4-7 9-7s9 3 9 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
                   Order for someone else
                 </span>
               </label>
 
-              {/* Delivery form */}
-              <div className="co-form">
-                {orderForOther && (
-                  <div className="co-form-section">
-                    <div className="co-form-section-label">
-                      <span className="material-symbols-outlined" style={{ fontSize: 16 }}>person</span>
-                      Delivery Recipient
+              {/* Delivery form — shown when no saved address selected OR ordering for other */}
+              {(selectedAddrIdx === null || orderForOther) && (
+                <div className="co-form">
+                  {/* Name */}
+                  <div className="co-field">
+                    <label className="co-field-label">{orderForOther ? 'Recipient Name' : 'Your Name'}</label>
+                    <div className="co-input-wrap">
+                      <span className="material-symbols-outlined co-input-icon">person</span>
+                      <input className="co-input" type="text" placeholder="Full name"
+                        value={orderForOther ? recipientForm.name : deliveryForm.name}
+                        onChange={(e) => orderForOther ? updateRecipient('name', e.target.value) : updateField('name', e.target.value)}
+                      />
                     </div>
                   </div>
-                )}
 
-                {/* Name */}
-                <div className="co-field">
-                  <label className="co-field-label">{orderForOther ? 'Recipient Name' : 'Your Name'}</label>
-                  <div className="co-input-wrap">
-                    <span className="material-symbols-outlined co-input-icon">person</span>
-                    <input
-                      className="co-input"
-                      type="text"
-                      placeholder="Full name"
-                      value={orderForOther ? recipientForm.name : deliveryForm.name}
-                      onChange={(e) => orderForOther ? updateRecipient('name', e.target.value) : updateField('name', e.target.value)}
+                  {/* Email */}
+                  <div className="co-field">
+                    <label className="co-field-label">Email Address</label>
+                    <div className="co-input-wrap">
+                      <span className="material-symbols-outlined co-input-icon">mail</span>
+                      <input className="co-input" type="email" placeholder="For order confirmation"
+                        value={orderForOther ? recipientForm.email : deliveryForm.email}
+                        onChange={(e) => orderForOther ? updateRecipient('email', e.target.value) : updateField('email', e.target.value)}
+                      />
+                    </div>
+                    {(orderForOther ? recipientForm.email : deliveryForm.email).length > 0 &&
+                      !(orderForOther ? recipientForm.email : deliveryForm.email).includes('@') && (
+                      <span className="co-field-error">Enter a valid email address</span>
+                    )}
+                  </div>
+
+                  {/* Phone */}
+                  <div className="co-field">
+                    <label className="co-field-label">{orderForOther ? 'Recipient Phone' : 'Contact Number'}</label>
+                    <div className="co-input-wrap">
+                      <span className="material-symbols-outlined co-input-icon">phone</span>
+                      <input className="co-input" type="tel" placeholder="10-digit mobile" maxLength={10}
+                        value={orderForOther ? recipientForm.phone : deliveryForm.phone}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '')
+                          orderForOther ? updateRecipient('phone', val) : updateField('phone', val)
+                        }}
+                      />
+                    </div>
+                    {(orderForOther ? recipientForm.phone : deliveryForm.phone).length > 0 &&
+                      !validatePhone(orderForOther ? recipientForm.phone : deliveryForm.phone) && (
+                      <span className="co-field-error">Enter a valid 10-digit number</span>
+                    )}
+                  </div>
+
+                  {/* Street */}
+                  <div className="co-field">
+                    <label className="co-field-label">House / Street / Area</label>
+                    <div className="co-input-wrap">
+                      <span className="material-symbols-outlined co-input-icon">home</span>
+                      <input className="co-input" type="text" placeholder="House no., Street, Area"
+                        value={orderForOther ? recipientForm.street : deliveryForm.street}
+                        onChange={(e) => orderForOther ? updateRecipient('street', e.target.value) : updateField('street', e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* City + State + PIN in one row */}
+                  <div className="co-field-row">
+                    <div className="co-field co-field-half">
+                      <label className="co-field-label">City</label>
+                      <input className="co-input co-input-plain" type="text" placeholder="City"
+                        value={orderForOther ? recipientForm.city : deliveryForm.city}
+                        onChange={(e) => orderForOther ? updateRecipient('city', e.target.value) : updateField('city', e.target.value)}
+                      />
+                    </div>
+                    <div className="co-field co-field-half">
+                      <label className="co-field-label">PIN Code</label>
+                      <input className="co-input co-input-plain" type="text" placeholder="6-digit PIN" maxLength={6}
+                        value={orderForOther ? recipientForm.pincode : deliveryForm.pincode}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '')
+                          orderForOther ? updateRecipient('pincode', val) : updateField('pincode', val)
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Instructions */}
+                  <div className="co-field">
+                    <label className="co-field-label">Delivery Note (optional)</label>
+                    <textarea className="co-textarea" placeholder="Ring bell, leave at door…" rows={2}
+                      value={orderForOther ? recipientForm.instructions : deliveryForm.instructions}
+                      onChange={(e) => orderForOther ? updateRecipient('instructions', e.target.value) : updateField('instructions', e.target.value)}
                     />
                   </div>
-                </div>
 
-                {/* Email */}
-                <div className="co-field">
-                  <label className="co-field-label">Email Address</label>
-                  <div className="co-input-wrap">
-                    <span className="material-symbols-outlined co-input-icon">mail</span>
-                    <input
-                      className="co-input"
-                      type="email"
-                      placeholder="For order confirmation"
-                      value={orderForOther ? recipientForm.email : deliveryForm.email}
-                      onChange={(e) => orderForOther ? updateRecipient('email', e.target.value) : updateField('email', e.target.value)}
-                    />
-                  </div>
-                  {(orderForOther ? recipientForm.email : deliveryForm.email).length > 0 &&
-                    !(orderForOther ? recipientForm.email : deliveryForm.email).includes('@') && (
-                    <span className="co-field-error">Enter a valid email address</span>
+                  {/* Save address checkbox */}
+                  {!orderForOther && (
+                    <label className="co-save-addr-row">
+                      <input type="checkbox" checked={saveAddress} onChange={e => setSaveAddress(e.target.checked)} />
+                      <span className="co-toggle-label">Save this address</span>
+                      {saveAddress && (
+                        <select className="co-addr-label-select" value={newAddrLabel} onChange={e => setNewAddrLabel(e.target.value)}>
+                          <option>Home</option>
+                          <option>Work</option>
+                          <option>Other</option>
+                        </select>
+                      )}
+                    </label>
+                  )}
+
+                  {/* Re-detect location */}
+                  {!orderForOther && locationStatus !== 'detecting' && (
+                    <button className="co-detect-btn" onClick={detectLocation}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="3" fill="#4CAF50"/>
+                        <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="#4CAF50" strokeWidth="1.5" strokeLinecap="round"/>
+                      </svg>
+                      Use my location
+                    </button>
                   )}
                 </div>
-
-                {/* Phone */}
-                <div className="co-field">
-                  <label className="co-field-label">{orderForOther ? 'Recipient Phone' : 'Contact Number'}</label>
-                  <div className="co-input-wrap">
-                    <span className="material-symbols-outlined co-input-icon">phone</span>
-                    <input
-                      className="co-input"
-                      type="tel"
-                      placeholder="10-digit mobile number"
-                      maxLength={10}
-                      value={orderForOther ? recipientForm.phone : deliveryForm.phone}
-                      onChange={(e) => {
-                        const val = e.target.value.replace(/\D/g, '')
-                        if (orderForOther) { updateRecipient('phone', val) } else { updateField('phone', val) }
-                      }}
-                    />
-                  </div>
-                  {(orderForOther ? recipientForm.phone : deliveryForm.phone).length > 0 &&
-                    !validatePhone(orderForOther ? recipientForm.phone : deliveryForm.phone) && (
-                    <span className="co-field-error">Enter a valid 10-digit number</span>
-                  )}
-                </div>
-
-                {/* Street / Address */}
-                <div className="co-field">
-                  <label className="co-field-label">Address (House/Street/Area)</label>
-                  <div className="co-input-wrap">
-                    <span className="material-symbols-outlined co-input-icon">home</span>
-                    <input
-                      className="co-input"
-                      type="text"
-                      placeholder="House no., Street, Area"
-                      value={orderForOther ? recipientForm.street : deliveryForm.street}
-                      onChange={(e) => orderForOther ? updateRecipient('street', e.target.value) : updateField('street', e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* City + State row */}
-                <div className="co-field-row">
-                  <div className="co-field co-field-half">
-                    <label className="co-field-label">City</label>
-                    <input
-                      className="co-input co-input-plain"
-                      type="text"
-                      placeholder="City"
-                      value={orderForOther ? recipientForm.city : deliveryForm.city}
-                      onChange={(e) => orderForOther ? updateRecipient('city', e.target.value) : updateField('city', e.target.value)}
-                    />
-                  </div>
-                  <div className="co-field co-field-half">
-                    <label className="co-field-label">State</label>
-                    <input
-                      className="co-input co-input-plain"
-                      type="text"
-                      placeholder="State"
-                      value={orderForOther ? recipientForm.state : deliveryForm.state}
-                      onChange={(e) => orderForOther ? updateRecipient('state', e.target.value) : updateField('state', e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* Pincode */}
-                <div className="co-field">
-                  <label className="co-field-label">PIN Code</label>
-                  <input
-                    className="co-input co-input-plain"
-                    type="text"
-                    placeholder="6-digit PIN"
-                    maxLength={6}
-                    value={orderForOther ? recipientForm.pincode : deliveryForm.pincode}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/\D/g, '')
-                      if (orderForOther) { updateRecipient('pincode', val) } else { updateField('pincode', val) }
-                    }}
-                  />
-                  {(orderForOther ? recipientForm.pincode : deliveryForm.pincode).length > 0 &&
-                    !validatePincode(orderForOther ? recipientForm.pincode : deliveryForm.pincode) && (
-                    <span className="co-field-error">Enter a valid 6-digit PIN</span>
-                  )}
-                </div>
-
-                {/* Delivery instructions */}
-                <div className="co-field">
-                  <label className="co-field-label">Delivery Instructions (optional)</label>
-                  <textarea
-                    className="co-textarea"
-                    placeholder="Ring the bell, leave at door, etc."
-                    rows={2}
-                    value={orderForOther ? recipientForm.instructions : deliveryForm.instructions}
-                    onChange={(e) => orderForOther ? updateRecipient('instructions', e.target.value) : updateField('instructions', e.target.value)}
-                  />
-                </div>
-
-                {/* Re-detect location */}
-                {!orderForOther && locationStatus !== 'detecting' && (
-                  <button className="co-detect-btn" onClick={detectLocation}>
-                    <span className="material-symbols-outlined" style={{ fontSize: 16 }}>my_location</span>
-                    Re-detect my location
-                  </button>
-                )}
-              </div>
+              )}
             </div>
 
             {/* ── Bill Summary ── */}

@@ -46,6 +46,13 @@ function ProductCard({ item, sectionId, onTap }) {
   const handleAdd = (e) => {
     e.stopPropagation()
     lightTap()
+
+    // Customizable items → open detail sheet for options
+    if (item.customizable) {
+      onTap(item)
+      return
+    }
+
     // Fly-to-cart animation
     if (addBtnRef.current) {
       const rect = addBtnRef.current.getBoundingClientRect()

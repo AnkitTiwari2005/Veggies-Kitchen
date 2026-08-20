@@ -708,3 +708,96 @@
     height: 72px;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   ADDRESS BOOK — saved address pills + COD row
+   ══════════════════════════════════════════════════════════════ */
+.co-addr-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 4px;
+}
+.co-addr-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(76,175,80,0.35);
+  background: transparent;
+  color: #ccc;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.co-addr-pill--active {
+  background: #4CAF50;
+  border-color: #4CAF50;
+  color: white;
+}
+.co-addr-selected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: rgba(76,175,80,0.08);
+  border: 1px solid rgba(76,175,80,0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 8px 0 12px;
+}
+.co-addr-selected-text {
+  font-size: 13px;
+  color: #ccc;
+  flex: 1;
+}
+.co-addr-edit-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4CAF50;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+.co-cod-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(76,175,80,0.06);
+  border-radius: 10px;
+  margin: 12px 0;
+  font-size: 13px;
+  color: #bbb;
+}
+.co-cod-badge {
+  margin-left: auto;
+  background: rgba(76,175,80,0.15);
+  color: #4CAF50;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+.co-save-addr-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.co-addr-label-select {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: #eee;
+  font-size: 12px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
