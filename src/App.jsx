@@ -806,18 +806,19 @@ export default function App() {
         <BlogProvider>
           <CartProvider>
             <LocationProvider>
-              {/* Splash screen manager (native only) */}
+               {/* Splash screen manager (native only) */}
               <SplashHandler />
 
-              {/* ── Header: Native App Bar vs Web Header ─── */}
-              {isNative ? (
+              {/* ── Native App Bar (native only, replaces web header visually) ── */}
+              {isNative && (
                 <NativeAppBar
                   onSearchClick={() => { window.location.hash = '#/search' }}
                   onNotificationClick={() => {}}
                 />
-              ) : (
-                !noHeader && <Header currentPage={currentPage} setCurrentPage={setCurrentPage} onAccountClick={goAccount} />
               )}
+
+              {/* ── Header: always rendered for bottom nav; top bar hidden on native via CSS ── */}
+              {!noHeader && <Header currentPage={currentPage} setCurrentPage={setCurrentPage} onAccountClick={goAccount} />}
 
               {/* ── Page Content ────────────────────────── */}
               {currentPage === 'home' ? (
@@ -875,3 +876,4 @@ export default function App() {
     </AuthProvider>
   )
 }
+

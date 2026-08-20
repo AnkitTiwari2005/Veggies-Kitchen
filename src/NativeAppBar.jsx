@@ -1,22 +1,23 @@
 import { useState, useEffect, useRef } from 'react'
-import { LocationIcon, ChevronDownIcon, BellIcon } from './icons'
-import { SearchIcon } from './icons'
+import { useLocation } from './LocationContext'
 
-export default function NativeAppBar({ onSearchClick, onNotificationClick }) {
+export default function NativeAppBar({ onSearchClick }) {
   const [hidden, setHidden] = useState(false)
   const lastScrollY = useRef(0)
+  let locationCtx = null
+  try { locationCtx = useLocation() } catch(e) {}
+  const locationName = locationCtx?.address?.split(',')[0] || 'Lajpat Nagar'
 
   useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY
-      if (currentY > lastScrollY.current && currentY > 80) {
-        setHidden(true) // scrolling down → hide
+      if (currentY > lastScrollY.current && currentY > 100) {
+        setHidden(true)
       } else {
-        setHidden(false) // scrolling up → show
+        setHidden(false)
       }
       lastScrollY.current = currentY
     }
-
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -24,28 +25,22 @@ export default function NativeAppBar({ onSearchClick, onNotificationClick }) {
   return (
     <header className={`native-app-bar${hidden ? ' hidden' : ''}`}>
       <div className="native-app-bar__left">
-        <span className="native-app-bar__brand">Veggies Kitchen</span>
+        <a href="#/" className="native-app-bar__brand" style={{ textDecoration: 'none' }}>
+          Veggies Kitchen
+        </a>
         <div className="native-app-bar__location">
-          <LocationIcon size={14} />
-          <span>Lajpat Nagar</span>
-          <ChevronDownIcon size={10} color="#888" />
+          <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#4CAF50' }}>location_on</span>
+          <span>{locationName}</span>
+          <span className="material-symbols-outlined" style={{ fontSize: 10, color: '#888' }}>expand_more</span>
         </div>
       </div>
 
       <div className="native-app-bar__actions">
-        <button
-          className="native-app-bar__icon-btn"
-          onClick={onSearchClick}
-          aria-label="Search"
-        >
-          <SearchIcon size={22} />
+        <button className="native-app-bar__icon-btn" onClick={onSearchClick} aria-label="Search">
+          <span className="material-symbols-outlined">search</span>
         </button>
-        <button
-          className="native-app-bar__icon-btn"
-          onClick={onNotificationClick}
-          aria-label="Notifications"
-        >
-          <BellIcon size={22} />
+        <button className="native-app-bar__icon-btn" aria-label="Notifications">
+          <span className="material-symbols-outlined">notifications</span>
         </button>
       </div>
     </header>

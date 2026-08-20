@@ -59,8 +59,8 @@ body.is-native {
   --container-padding: 16px !important;
 }
 
-/* Hide ALL web-only sections */
-body.is-native .site-header { display: none !important; }
+/* Hide web-only top header bar (but keep mobile-bottom-nav!) */
+body.is-native header.site-header { display: none !important; }
 body.is-native .global-contact-footer { display: none !important; }
 body.is-native .hero { display: none !important; }
 body.is-native .showcase-section { display: none !important; }
@@ -1308,3 +1308,537 @@ body.is-native .checkout-sticky-cta button:active {
 
 .native-toast--success svg { fill: var(--native-green); }
 .native-toast--error svg { fill: var(--native-red); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   NATIVE HOME PAGE v2 — nh- prefix
+   ═══════════════════════════════════════════════════════════════════ */
+
+.nh {
+  padding: 8px 16px 0;
+}
+
+/* Search bar */
+.nh-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 16px;
+  background: var(--native-surface-2);
+  border: 1px solid var(--native-border);
+  border-radius: 24px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+.nh-search:active { background: var(--native-surface-3); }
+.nh-search span { font-size: 14px; color: #666; }
+
+/* Banners */
+.nh-banners {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  margin: 0 -16px;
+  padding: 0 16px 4px;
+}
+.nh-banners::-webkit-scrollbar { display: none; }
+
+.nh-banner {
+  min-width: 82%;
+  height: 130px;
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  scroll-snap-align: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.nh-banner__content { z-index: 1; }
+.nh-banner__icon { font-size: 24px; display: block; margin-bottom: 4px; }
+.nh-banner__title { font-family: var(--font-headline); font-size: 22px; font-weight: 800; color: white; line-height: 1.2; }
+.nh-banner__sub { font-size: 13px; color: rgba(255,255,255,0.85); margin-top: 2px; }
+.nh-banner__cta {
+  align-self: flex-start;
+  padding: 6px 18px;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 1;
+  backdrop-filter: blur(4px);
+}
+
+/* Banner dots */
+.nh-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 10px 0 20px;
+}
+.nh-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #444;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 250ms ease;
+}
+.nh-dot.active {
+  width: 22px;
+  border-radius: 3px;
+  background: var(--native-green);
+}
+
+/* Section headers */
+.nh-section { margin-bottom: 24px; }
+.nh-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.nh-section__title {
+  font-family: var(--font-headline);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--native-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nh-section__link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--native-green);
+  cursor: pointer;
+}
+
+/* ── Categories (food image circles) ──────────────────────────── */
+.nh-cats {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 0 8px;
+  margin: 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+.nh-cats::-webkit-scrollbar { display: none; }
+
+.nh-cat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 72px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nh-cat__circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--native-border);
+  background: var(--native-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 200ms var(--spring-gentle), border-color 200ms ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.nh-cat:active .nh-cat__circle {
+  transform: scale(0.9);
+  border-color: var(--native-green);
+}
+
+.nh-cat__circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nh-cat__emoji {
+  color: var(--native-text-muted);
+  font-size: 24px;
+}
+
+.nh-cat__name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--native-text-secondary);
+  text-align: center;
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Popular items horizontal scroll ─────────────────────────── */
+.nh-hscroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 0 8px;
+  margin: 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+.nh-hscroll::-webkit-scrollbar { display: none; }
+
+.nh-pcard {
+  min-width: 160px;
+  max-width: 160px;
+  background: var(--native-surface);
+  border: 1px solid var(--native-border);
+  border-radius: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  transition: transform 200ms var(--spring-gentle);
+}
+.nh-pcard:active { transform: scale(0.96); }
+
+.nh-pcard__imgwrap {
+  position: relative;
+  width: 100%;
+  height: 130px;
+  overflow: hidden;
+}
+
+.nh-pcard__imgwrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nh-pcard__badge {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  padding: 2px 8px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #FFB300;
+}
+
+.nh-pcard__body { padding: 10px 12px 12px; }
+
+.nh-pcard__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--native-text);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 6px;
+}
+
+.nh-pcard__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nh-pcard__price {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--native-text);
+}
+
+/* ADD button */
+.nh-addbtn {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--native-green);
+  background: transparent;
+  color: var(--native-green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  min-height: 30px;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+.nh-addbtn:active {
+  background: var(--native-green);
+  color: white;
+  transform: scale(0.95);
+}
+
+/* ── Specials (vertical list) ────────────────────────────────── */
+.nh-specials {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nh-scard {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: var(--native-surface);
+  border: 1px solid var(--native-border);
+  border-radius: 14px;
+  align-items: center;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.15);
+  transition: transform 200ms var(--spring-gentle);
+}
+.nh-scard:active { transform: scale(0.98); }
+
+.nh-scard__img {
+  width: 76px;
+  height: 76px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--native-surface-2);
+}
+
+.nh-scard__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.nh-scard__top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.nh-scard__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--native-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nh-scard__desc {
+  font-size: 12px;
+  color: var(--native-text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.nh-scard__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nh-scard__price {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--native-text);
+}
+
+/* ── Trust section ───────────────────────────────────────────── */
+.nh-trust {
+  background: var(--native-surface);
+  border: 1px solid var(--native-border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.nh-trust__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--native-text);
+  margin-bottom: 14px;
+}
+
+.nh-trust__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.nh-trust__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--native-text-secondary);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MENU PAGE — Native overrides
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Hide the big hero and video background */
+body.is-native .menu-hero { display: none !important; }
+body.is-native .menu-page-header { display: none !important; }
+body.is-native .page-bg { display: none !important; }
+body.is-native .page-overlay { display: none !important; }
+
+/* Override menu page background & padding */
+body.is-native .menu-page {
+  padding-top: 4px !important;
+  background: var(--native-bg) !important;
+}
+
+/* Category nav — compact and sticky */
+body.is-native .menu-category-nav {
+  position: sticky !important;
+  top: calc(var(--safe-area-top) + var(--app-bar-height)) !important;
+  z-index: 100 !important;
+  background: var(--native-bg) !important;
+  padding: 8px 0 !important;
+  margin: 0 !important;
+  border-bottom: 1px solid var(--native-border) !important;
+}
+
+body.is-native .menu-category-nav-inner {
+  scrollbar-width: none !important;
+}
+body.is-native .menu-category-nav-inner::-webkit-scrollbar { display: none !important; }
+
+body.is-native .menu-category-pill {
+  background: var(--native-surface) !important;
+  border: 1px solid var(--native-border) !important;
+  border-radius: 20px !important;
+  font-size: 13px !important;
+  padding: 6px 14px !important;
+  white-space: nowrap !important;
+  backdrop-filter: none !important;
+}
+
+body.is-native .menu-category-pill.active {
+  background: var(--native-green) !important;
+  border-color: var(--native-green) !important;
+  color: white !important;
+}
+
+/* Product cards — tighter on mobile */
+body.is-native .product-card {
+  background: var(--native-surface) !important;
+  border: 1px solid var(--native-border) !important;
+  border-radius: 14px !important;
+  margin-bottom: 8px !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.is-native .product-card-image img {
+  border-radius: 12px !important;
+}
+
+/* Fix badge text wrapping */
+body.is-native .product-badge {
+  white-space: nowrap !important;
+  font-size: 10px !important;
+  padding: 3px 8px !important;
+  backdrop-filter: none !important;
+}
+
+body.is-native .product-badge-custom {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.is-native .product-order-btn {
+  border-color: var(--native-green) !important;
+  color: var(--native-green) !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  backdrop-filter: none !important;
+}
+
+body.is-native .product-order-btn:active {
+  background: var(--native-green) !important;
+  color: white !important;
+}
+
+/* Menu section headers */
+body.is-native .menu-section-header {
+  padding: 12px 0 8px !important;
+}
+
+body.is-native .menu-section-block {
+  padding: 0 12px !important;
+}
+
+/* Hide menu's own floating CTA on native (we have FloatingCartBar) */
+body.is-native .menu-floating-cta {
+  display: none !important;
+}
+
+/* Menu content */
+body.is-native .menu-content {
+  background: transparent !important;
+  backdrop-filter: none !important;
+}
+
+/* Product grid — single column on native */
+body.is-native .product-grid {
+  gap: 8px !important;
+}
+
+/* Search wrap in menu */
+body.is-native .menu-search-wrap {
+  background: var(--native-surface-2) !important;
+  border: 1px solid var(--native-border) !important;
+  backdrop-filter: none !important;
+}
+
+/* Glass panels in menu */
+body.is-native .menu-category-card.glass-panel {
+  background: var(--native-surface) !important;
+  backdrop-filter: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CHECKOUT — Native overrides
+   ═══════════════════════════════════════════════════════════════════ */
+
+body.is-native .checkout-container,
+body.is-native .checkout-page {
+  padding-bottom: 80px !important;
+  background: var(--native-bg) !important;
+}
+
+/* Kill glass effects in checkout */
+body.is-native .checkout-card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--native-surface) !important;
+  border: 1px solid var(--native-border) !important;
+}
+
+
