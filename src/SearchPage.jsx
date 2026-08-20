@@ -1,243 +1,224 @@
-import { useState, useEffect, useRef } from 'react'
+/* ═══════════════════════════════════════════════════════════════════
+   VEGGIES KITCHEN — Native Search Page
+   Fast live search with filtering, direct cart additions, and recents.
+   ═══════════════════════════════════════════════════════════════════ */
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useCart } from './CartContext'
+import { useAdmin } from './AdminContext'
 import { lightTap, mediumTap } from './services/haptics'
 import { saveRecentSearches, getRecentSearches } from './services/storage'
+import { VegBadge } from './icons'
 import './SearchPage.css'
 
-const navigate = (to) => { window.location.hash = `#${to}` }
-
-
-// Flatten all menu items for searching
-function buildSearchIndex(menuData) {
-  const items = []
-  if (!Array.isArray(menuData)) return items
-  for (const category of menuData) {
-    if (!Array.isArray(category.items)) continue
-    for (const item of category.items) {
-      items.push({
-        ...item,
-        category: category.name,
-        categoryId: category.id,
-        searchText: `${item.name} ${category.name} ${item.description || ''}`.toLowerCase(),
-      })
-    }
-  }
-  return items
-}
+const QUICK_SEARCH_CHIPS = ['Paneer', 'Dal Makhani', 'Biryani', 'Naan', 'Chaap', 'Combos', 'Thali']
 
 export default function SearchPage({ menuData = [] }) {
-  const { addToCart, cartItems } = useCart()
+  const { addToCart, updateQuantity, cartItems } = useCart()
+  const { menuSections } = useAdmin()
   const inputRef = useRef(null)
 
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState([])
   const [recentSearches, setRecentSearches] = useState([])
   const [activeFilter, setActiveFilter] = useState('all') // 'all' | 'veg' | 'popular'
-  const [priceRange, setPriceRange] = useState([0, 1000])
-  const [isSearching, setIsSearching] = useState(false)
 
-  const searchIndex = buildSearchIndex(menuData)
+  // Build searchable index from AdminContext or prop
+  const searchIndex = useMemo(() => {
+    const rawSections = (menuSections && menuSections.length > 0) ? menuSections : menuData
+    const items = []
+    if (!Array.isArray(rawSections)) return items
 
-  // ── Load recent searches ────────────────────────────────────────────────────
+    for (const section of rawSections) {
+      if (!Array.isArray(section.items)) continue
+      for (const item of section.items) {
+        items.push({
+          ...item,
+          category: section.name,
+          categoryId: section.id,
+          searchText: `${item.name} ${section.name} ${item.description || ''}`.toLowerCase(),
+        })
+      }
+    }
+    return items
+  }, [menuSections, menuData])
+
+  // Load recent searches
   useEffect(() => {
     getRecentSearches().then(searches => {
       setRecentSearches(searches || [])
     })
-    // Auto-focus input
-    setTimeout(() => inputRef.current?.focus(), 100)
+    setTimeout(() => inputRef.current?.focus(), 150)
   }, [])
 
-  // ── Search logic with debounce ──────────────────────────────────────────────
-  useEffect(() => {
-    if (!query.trim()) {
-      setResults([])
-      setIsSearching(false)
-      return
+  // Filter results
+  const results = useMemo(() => {
+    if (!query.trim()) return []
+    const q = query.toLowerCase().trim()
+    let filtered = searchIndex.filter(item => item.searchText.includes(q))
+
+    if (activeFilter === 'veg') {
+      filtered = filtered.filter(item => item.isVeg !== false)
+    } else if (activeFilter === 'popular') {
+      filtered = filtered.filter(item => item.featured)
     }
-    setIsSearching(true)
-    const timer = setTimeout(() => {
-      const q = query.toLowerCase().trim()
-      let filtered = searchIndex.filter(item => item.searchText.includes(q))
 
-      if (activeFilter === 'veg') {
-        filtered = filtered.filter(item => item.isVeg !== false)
-      }
+    return filtered
+  }, [query, searchIndex, activeFilter])
 
-      const [minP, maxP] = priceRange
-      filtered = filtered.filter(item => {
-        const price = parseFloat(String(item.price).replace(/[^0-9.]/g, '')) || 0
-        return price >= minP && price <= maxP
-      })
-
-      setResults(filtered)
-      setIsSearching(false)
-    }, 200)
-    return () => clearTimeout(timer)
-  }, [query, activeFilter, priceRange])
-
-  // ── Save search to recents ──────────────────────────────────────────────────
-  async function saveSearch(term) {
+  const saveSearch = async (term) => {
     if (!term.trim()) return
-    const updated = [term, ...recentSearches.filter(s => s !== term)].slice(0, 8)
+    const updated = [term, ...recentSearches.filter(s => s !== term)].slice(0, 6)
     setRecentSearches(updated)
     await saveRecentSearches(updated)
   }
 
-  function handleSearch(e) {
+  const handleSearchSubmit = (e) => {
     e.preventDefault()
     if (query.trim()) saveSearch(query.trim())
   }
 
-  function handleRecentTap(term) {
+  const handleChipTap = (term) => {
     lightTap()
     setQuery(term)
+    saveSearch(term)
   }
 
-  function handleClear() {
+  const handleClear = () => {
+    lightTap()
     setQuery('')
     inputRef.current?.focus()
   }
 
-  function handleAddToCart(item) {
+  const handleGoBack = () => {
+    lightTap()
+    window.history.back()
+  }
+
+  const handleAdd = (item) => {
     mediumTap()
     addToCart(item)
   }
 
-  function getCartQuantity(itemName) {
-    return cartItems.find(i => i.name === itemName)?.quantity || 0
+  const getItemQuantity = (itemName) => {
+    const found = cartItems.find(i => i.name === itemName)
+    return found ? found.quantity : 0
   }
 
   return (
-    <div className="search-page">
-      {/* ── Search Bar ─────────────────────────────────────────────────── */}
-      <div className="search-header">
-        <button className="search-back-btn" onClick={() => { lightTap(); navigate(-1) }} aria-label="Go back">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5M12 5l-7 7 7 7"/>
-          </svg>
+    <div className="search-page-native">
+      {/* ── Top Header ───────────────────────────────── */}
+      <div className="sp-header">
+        <button className="sp-back-btn" onClick={handleGoBack} aria-label="Go back">
+          <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <form className="search-form" onSubmit={handleSearch}>
-          <div className="search-input-wrap">
-            <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
+
+        <form className="sp-form" onSubmit={handleSearchSubmit}>
+          <div className="sp-input-wrap">
+            <span className="material-symbols-outlined sp-search-icon">search</span>
             <input
               ref={inputRef}
-              type="search"
-              className="search-input"
-              placeholder="Search dishes, categories..."
+              type="text"
+              className="sp-input"
+              placeholder="Search dishes, curries, breads..."
               value={query}
-              onChange={e => setQuery(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
               autoComplete="off"
-              autoCorrect="off"
-              spellCheck="false"
-              enterKeyHint="search"
             />
             {query && (
-              <button type="button" className="search-clear-btn" onClick={handleClear} aria-label="Clear search">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 6 6 18M6 6l12 12"/>
-                </svg>
+              <button type="button" className="sp-clear-btn" onClick={handleClear} aria-label="Clear">
+                <span className="material-symbols-outlined">close</span>
               </button>
             )}
           </div>
         </form>
       </div>
 
-      {/* ── Filters ────────────────────────────────────────────────────── */}
-      {query && (
-        <div className="search-filters">
-          {['all', 'veg', 'popular'].map(f => (
-            <button
-              key={f}
-              className={`filter-chip ${activeFilter === f ? 'active' : ''}`}
-              onClick={() => { lightTap(); setActiveFilter(f) }}
-            >
-              {f === 'all' ? '🍽 All' : f === 'veg' ? '🥗 Veg' : '⭐ Popular'}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* ── Quick Chips ──────────────────────────────── */}
+      <div className="sp-chips-bar">
+        {QUICK_SEARCH_CHIPS.map(chip => (
+          <button
+            key={chip}
+            className={`sp-chip ${query.toLowerCase() === chip.toLowerCase() ? 'active' : ''}`}
+            onClick={() => handleChipTap(chip)}
+          >
+            {chip}
+          </button>
+        ))}
+      </div>
 
-      {/* ── Results / Empty state / Recents ────────────────────────────── */}
-      <div className="search-body">
-        {!query ? (
-          /* Recent searches */
-          <div className="recents-section">
+      {/* ── Main Body ────────────────────────────────── */}
+      <div className="sp-body">
+        {!query.trim() ? (
+          <div className="sp-empty-prompt">
             {recentSearches.length > 0 && (
-              <>
-                <div className="section-header">
-                  <span className="section-title">Recent Searches</span>
-                  <button className="section-action" onClick={async () => { setRecentSearches([]); await saveRecentSearches([]) }}>Clear</button>
+              <div className="sp-recents">
+                <div className="sp-recents-header">
+                  <span>Recent Searches</span>
+                  <button onClick={() => { setRecentSearches([]); saveRecentSearches([]) }}>Clear</button>
                 </div>
-                <div className="recent-tags">
+                <div className="sp-recents-list">
                   {recentSearches.map(term => (
-                    <button key={term} className="recent-tag" onClick={() => handleRecentTap(term)}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                      </svg>
-                      {term}
-                    </button>
+                    <div key={term} className="sp-recent-item" onClick={() => handleChipTap(term)}>
+                      <span className="material-symbols-outlined">history</span>
+                      <span>{term}</span>
+                    </div>
                   ))}
                 </div>
-              </>
+              </div>
             )}
-            <div className="search-prompt">
-              <div className="search-prompt-icon">🔍</div>
-              <p>Search for your favourite dishes</p>
+            <div className="sp-welcome">
+              <span className="material-symbols-outlined" style={{ fontSize: 48, color: '#4CAF50' }}>restaurant</span>
+              <p>Type anything to search 100+ dishes</p>
             </div>
-          </div>
-        ) : isSearching ? (
-          <div className="search-loading">
-            <div className="search-spinner" />
-            <span>Searching...</span>
           </div>
         ) : results.length === 0 ? (
-          <div className="search-empty">
-            <div className="search-empty-icon">😕</div>
-            <h3>No results for "{query}"</h3>
-            <p>Try a different spelling or browse the menu</p>
-            <button className="browse-menu-btn" onClick={() => navigate('/#menu')}>Browse Menu</button>
+          <div className="sp-no-results">
+            <span className="material-symbols-outlined" style={{ fontSize: 54, color: '#666' }}>search_off</span>
+            <h3>No dishes found for "{query}"</h3>
+            <p>Try searching for Paneer, Dal Makhani, Biryani, or Combos</p>
           </div>
         ) : (
-          <div className="search-results">
-            <p className="results-count">{results.length} result{results.length !== 1 ? 's' : ''} for "{query}"</p>
-            <div className="results-list">
-              {results.map((item, idx) => {
-                const qty = getCartQuantity(item.name)
-                const price = parseFloat(String(item.price).replace(/[^0-9.]/g, '')) || 0
-                return (
-                  <div key={`${item.name}-${idx}`} className="result-card">
-                    {item.image && (
-                      <div className="result-image">
-                        <img src={item.image} alt={item.name} loading="lazy" />
-                      </div>
+          <div className="sp-results-list">
+            <div className="sp-count-bar">{results.length} dishes found</div>
+            {results.map((item, idx) => {
+              const qty = getItemQuantity(item.name)
+              return (
+                <div key={`${item.name}-${idx}`} className="sp-card">
+                  {item.image ? (
+                    <img src={item.image} alt={item.name} className="sp-card-img" loading="lazy" />
+                  ) : (
+                    <div className="sp-card-placeholder">
+                      <span className="material-symbols-outlined" style={{ fontSize: 28, color: '#4CAF50' }}>restaurant</span>
+                    </div>
+                  )}
+
+                  <div className="sp-card-info">
+                    <div className="sp-card-top">
+                      <VegBadge size={14} />
+                      <span className="sp-card-name">{item.name}</span>
+                    </div>
+                    <span className="sp-card-cat">{item.category}</span>
+                    {item.description && (
+                      <p className="sp-card-desc">{item.description}</p>
                     )}
-                    <div className="result-info">
-                      <div className="result-category">{item.category}</div>
-                      <h4 className="result-name">{item.name}</h4>
-                      {item.description && <p className="result-desc">{item.description}</p>}
-                      <div className="result-footer">
-                        <span className="result-price">₹{price}</span>
-                        <div className="result-cart-control">
-                          {qty > 0 ? (
-                            <div className="qty-control">
-                              <button className="qty-btn" onClick={() => handleAddToCart({ ...item, quantity: -1 })}>−</button>
-                              <span className="qty-num">{qty}</span>
-                              <button className="qty-btn" onClick={() => handleAddToCart(item)}>+</button>
-                            </div>
-                          ) : (
-                            <button className="add-btn" onClick={() => handleAddToCart(item)}>
-                              + Add
-                            </button>
-                          )}
+                    <div className="sp-card-bottom">
+                      <span className="sp-card-price">₹{item.price}</span>
+
+                      {qty > 0 ? (
+                        <div className="sp-stepper">
+                          <button onClick={() => updateQuantity(item.name, -1)}>−</button>
+                          <span>{qty}</span>
+                          <button onClick={() => updateQuantity(item.name, 1)}>+</button>
                         </div>
-                      </div>
+                      ) : (
+                        <button className="sp-add-btn" onClick={() => handleAdd(item)}>
+                          ADD
+                        </button>
+                      )}
                     </div>
                   </div>
-                )
-              })}
-            </div>
+                </div>
+              )
+            })}
           </div>
         )}
       </div>

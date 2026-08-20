@@ -14,6 +14,8 @@ import SplashHandler from './SplashHandler'
 import NativeAppBar from './NativeAppBar'
 import NativeHomePage from './NativeHomePage'
 import FloatingCartBar from './FloatingCartBar'
+import BottomNavBar from './BottomNavBar'
+import LocationPickerModal from './LocationPickerModal'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
@@ -82,7 +84,6 @@ function Header({ currentPage, setCurrentPage }) {
   }
 
   return (
-    <>
     <header className="site-header" id="site-header">
       <a href="#/" className="site-logo" onClick={goHome} style={{ cursor: 'pointer' }}>Veggies Kitchen</a>
       
@@ -126,32 +127,6 @@ function Header({ currentPage, setCurrentPage }) {
         )}
       </div>
     </header>
-    <nav className="mobile-bottom-nav">
-      <a href="#/" className={currentPage === 'home' ? 'active' : ''} onClick={goHome}>
-        <span className="material-symbols-outlined">home</span>
-        <span>Home</span>
-      </a>
-      <a href="#/menu" className={currentPage === 'menu' ? 'active' : ''} onClick={goMenu}>
-        <span className="material-symbols-outlined">restaurant_menu</span>
-        <span>Menu</span>
-      </a>
-      <a href="#/checkout" className={currentPage === 'checkout' ? 'active' : ''} onClick={goCheckout} style={{ position: 'relative' }}>
-        <span className="material-symbols-outlined">shopping_cart</span>
-        <span>Cart</span>
-        {cartCount > 0 && (
-          <span className="mobile-cart-badge">{cartCount}</span>
-        )}
-      </a>
-      <a href="#/orders" className={currentPage === 'orders' ? 'active' : ''} onClick={goOrders}>
-        <span className="material-symbols-outlined">receipt_long</span>
-        <span>Orders</span>
-      </a>
-      <a href="#/account" className={currentPage === 'account' ? 'active' : ''} onClick={goAccount}>
-        <span className="material-symbols-outlined">account_circle</span>
-        <span>Account</span>
-      </a>
-    </nav>
-    </>
   )
 }
 
@@ -796,6 +771,9 @@ export default function App() {
   const noFooter = currentPage === 'admin' || currentPage === 'search' ||
                    currentPage === 'track' || currentPage === 'login'
 
+  const hideBottomNav = currentPage === 'search' || currentPage === 'track' ||
+                        currentPage === 'login' || currentPage === 'admin' || currentPage === 'write-blog'
+
   // Pages where floating cart bar should NOT show
   const noCartBar = currentPage === 'checkout' || currentPage === 'search' ||
                     currentPage === 'track' || currentPage === 'login' || currentPage === 'admin'
@@ -806,19 +784,22 @@ export default function App() {
         <BlogProvider>
           <CartProvider>
             <LocationProvider>
-               {/* Splash screen manager (native only) */}
+              {/* Splash screen manager (native only) */}
               <SplashHandler />
 
-              {/* ── Native App Bar (native only, replaces web header visually) ── */}
-              {isNative && (
-                <NativeAppBar
-                  onSearchClick={() => { window.location.hash = '#/search' }}
-                  onNotificationClick={() => {}}
-                />
-              )}
+              {/* Location selection modal */}
+              <LocationPickerModal />
 
-              {/* ── Header: always rendered for bottom nav; top bar hidden on native via CSS ── */}
-              {!noHeader && <Header currentPage={currentPage} setCurrentPage={setCurrentPage} onAccountClick={goAccount} />}
+              {/* ── Native App Bar (native only, replaces web header visually) ── */}
+              {isNative ? (
+                !noHeader && (
+                  <NativeAppBar
+                    onSearchClick={() => { window.location.hash = '#/search' }}
+                  />
+                )
+              ) : (
+                !noHeader && <Header currentPage={currentPage} setCurrentPage={setCurrentPage} onAccountClick={goAccount} />
+              )}
 
               {/* ── Page Content ────────────────────────── */}
               {currentPage === 'home' ? (
@@ -866,6 +847,9 @@ export default function App() {
 
               {/* ── Floating Cart Bar (native only, above tab bar) ── */}
               {isNative && !noCartBar && <FloatingCartBar />}
+
+              {/* ── Bottom Nav Bar (mobile tab bar) ────────────────── */}
+              {!hideBottomNav && <BottomNavBar currentPage={currentPage} />}
 
               {/* ── Footer (web only) ──────────────────── */}
               {!isNative && !noFooter && <Footer />}

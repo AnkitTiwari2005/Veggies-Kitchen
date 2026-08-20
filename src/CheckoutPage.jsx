@@ -5,6 +5,7 @@ import { SECTION_EMOJI } from './menuData'
 import { getRecommendations } from './recommendationEngine'
 import { useAdmin, BackgroundMedia } from './AdminContext'
 import { useAuth } from './AuthContext'
+import { isNative } from './hooks/useCapacitor'
 import { API_BASE } from './config'
 import './CheckoutPage.css'
 
@@ -195,20 +196,22 @@ export default function CheckoutPage() {
   /* ── Render ─────────────────────────── */
   return (
     <div className="checkout-page" style={{ position: 'relative', minHeight: '100vh' }}>
-      {/* ── Fixed Video Background ── */}
-      <div className="page-bg" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
-        <BackgroundMedia media={menuBackdrop} /> 
-        <div className="page-overlay" style={{ 
-          position: 'absolute', 
-          inset: 0, 
-          background: 'rgba(20, 19, 19, 0.85)', 
-          backdropFilter: 'blur(12px)' 
-        }} />
-      </div>
+      {/* ── Fixed Video Background (web only) ── */}
+      {!isNative && (
+        <div className="page-bg" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
+          <BackgroundMedia media={menuBackdrop} /> 
+          <div className="page-overlay" style={{ 
+            position: 'absolute', 
+            inset: 0, 
+            background: 'rgba(20, 19, 19, 0.85)', 
+            backdropFilter: 'blur(12px)' 
+          }} />
+        </div>
+      )}
+
       {/* ── Page Title ── */}
       <div className="co-title-wrap">
         <h1 className="co-title text-headline-lg">Checkout</h1>
-        <p className="co-subtitle text-body-lg">Review your cinematic dining experience.</p>
       </div>
 
       <div className="co-grid">

@@ -1,17 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from './LocationContext'
+import { lightTap } from './services/haptics'
 
 export default function NativeAppBar({ onSearchClick }) {
   const [hidden, setHidden] = useState(false)
   const lastScrollY = useRef(0)
-  let locationCtx = null
-  try { locationCtx = useLocation() } catch(e) {}
-  const locationName = locationCtx?.address?.split(',')[0] || 'Lajpat Nagar'
+  const { address, setIsModalOpen } = useLocation()
+  
+  const locationLabel = address?.street || address?.city || 'Lajpat Nagar 4'
 
   useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY
-      if (currentY > lastScrollY.current && currentY > 100) {
+      if (currentY > lastScrollY.current && currentY > 80) {
         setHidden(true)
       } else {
         setHidden(false)
@@ -22,25 +23,42 @@ export default function NativeAppBar({ onSearchClick }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const handleLocationClick = () => {
+    lightTap()
+    setIsModalOpen(true)
+  }
+
+  const handleSearchTap = () => {
+    lightTap()
+    if (onSearchClick) onSearchClick()
+    else window.location.hash = '#/search'
+  }
+
   return (
     <header className={`native-app-bar${hidden ? ' hidden' : ''}`}>
       <div className="native-app-bar__left">
         <a href="#/" className="native-app-bar__brand" style={{ textDecoration: 'none' }}>
           Veggies Kitchen
         </a>
-        <div className="native-app-bar__location">
-          <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#4CAF50' }}>location_on</span>
-          <span>{locationName}</span>
-          <span className="material-symbols-outlined" style={{ fontSize: 10, color: '#888' }}>expand_more</span>
-        </div>
+        <button 
+          type="button" 
+          className="native-app-bar__location"
+          onClick={handleLocationClick}
+          aria-label="Change location"
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#4CAF50' }}>location_on</span>
+          <span className="location-text">{locationLabel}</span>
+          <span className="material-symbols-outlined" style={{ fontSize: 16, color: '#888' }}>expand_more</span>
+        </button>
       </div>
 
       <div className="native-app-bar__actions">
-        <button className="native-app-bar__icon-btn" onClick={onSearchClick} aria-label="Search">
+        <button 
+          className="native-app-bar__icon-btn" 
+          onClick={handleSearchTap} 
+          aria-label="Search dishes"
+        >
           <span className="material-symbols-outlined">search</span>
-        </button>
-        <button className="native-app-bar__icon-btn" aria-label="Notifications">
-          <span className="material-symbols-outlined">notifications</span>
         </button>
       </div>
     </header>

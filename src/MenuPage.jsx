@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { SECTION_EMOJI } from './menuData'
 import { useAdmin, BackgroundMedia } from './AdminContext'
 import { useCart } from './CartContext'
+import { isNative } from './hooks/useCapacitor'
 import './MenuPage.css'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
@@ -13,8 +14,10 @@ gsap.registerPlugin(ScrollTrigger, useGSAP)
    PRODUCT CARD
    ══════════════════════════════════════════════ */
 function ProductCard({ item, sectionId }) {
-  const { addToCart } = useCart()
+  const { addToCart, updateQuantity, cartItems } = useCart()
   const emoji = SECTION_EMOJI[sectionId] || '🍽️'
+  const cartItem = cartItems?.find(i => i.name === item.name)
+  const qty = cartItem ? cartItem.quantity : 0
 
   return (
     <div className="product-card" id={`product-${item.id}`}>
@@ -32,35 +35,36 @@ function ProductCard({ item, sectionId }) {
         </div>
         <p className="product-card-desc">{item.description}</p>
         <div className="product-card-footer">
-          {item.featured && (
-            <span className="product-badge product-badge-featured">
-              <span className="material-symbols-outlined icon-filled">stars</span>
-              Chef&apos;s Pick
-            </span>
+          <div className="product-badges-wrap" style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {item.featured && (
+              <span className="product-badge product-badge-featured">
+                <span className="material-symbols-outlined icon-filled">stars</span>
+                Chef&apos;s Pick
+              </span>
+            )}
+            {item.customizable && (
+              <span className="product-badge product-badge-custom">
+                <span className="material-symbols-outlined">tune</span>
+                Custom
+              </span>
+            )}
+          </div>
+          {qty > 0 ? (
+            <div className="sp-stepper" style={{ marginLeft: 'auto' }}>
+              <button type="button" onClick={() => updateQuantity(item.name, -1)} aria-label="Decrease quantity">−</button>
+              <span>{qty}</span>
+              <button type="button" onClick={() => updateQuantity(item.name, 1)} aria-label="Increase quantity">+</button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="product-order-btn"
+              onClick={() => addToCart(item)}
+            >
+              <span className="material-symbols-outlined">add</span>
+              ADD
+            </button>
           )}
-          {item.customizable && (
-            <span className="product-badge product-badge-custom">
-              <span className="material-symbols-outlined">tune</span>
-              Customizable
-            </span>
-          )}
-          <button
-            className="product-order-btn"
-            onClick={() => {
-              addToCart(item)
-              const el = document.createElement('div')
-              el.innerHTML = '<span class="material-symbols-outlined" style="color: var(--secondary)">check_circle</span> Added!'
-              el.style = 'position: fixed; top: 20px; right: 20px; background: var(--surface-container); padding: 12px 24px; border-radius: 8px; z-index: 9999; display: flex; gap: 8px; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid var(--glass-border); animation: fadeInUp 0.3s ease forwards;'
-              document.body.appendChild(el)
-              setTimeout(() => {
-                el.style.animation = 'fadeInUp 0.3s ease reverse forwards'
-                setTimeout(() => el.remove(), 300)
-              }, 2000)
-            }}
-          >
-            <span className="material-symbols-outlined">add_shopping_cart</span>
-            Add
-          </button>
         </div>
       </div>
     </div>
@@ -233,70 +237,74 @@ export default function MenuPage() {
 
   return (
     <div className="menu-page">
-      {/* ── Fixed Video Background ── */}
-      <div className="page-bg" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
-        <BackgroundMedia media={menuBackdrop} />
-        <div className="page-overlay" style={{ 
-          position: 'absolute', 
-          inset: 0, 
-          background: 'rgba(20, 19, 19, 0.85)', 
-          backdropFilter: 'blur(12px)' 
-        }} />
-      </div>
-
-      {/* ── Hero ── */}
-      <section className="menu-hero" style={{ background: 'transparent' }}>
-        <div className="menu-hero-content">
-          <div className="menu-hero-badge">
-            <span className="material-symbols-outlined icon-filled">eco</span>
-            100% Vegetarian
-          </div>
-          <h1>
-            Our Complete <span className="accent">Menu</span>
-          </h1>
-          <p className="menu-hero-subtitle">
-            Explore {totalProducts}+ handcrafted dishes across {menuSections.length} categories — from smoky tandoor to
-            creamy curries, every bite tells a story.
-          </p>
-
-          <div className="menu-hero-stats">
-            <div className="menu-hero-stat">
-              <div className="menu-hero-stat-value">{totalProducts}+</div>
-              <div className="menu-hero-stat-label">Dishes</div>
-            </div>
-            <div className="menu-hero-stat">
-              <div className="menu-hero-stat-value">{menuSections.length}</div>
-              <div className="menu-hero-stat-label">Categories</div>
-            </div>
-            <div className="menu-hero-stat">
-              <div className="menu-hero-stat-value">100%</div>
-              <div className="menu-hero-stat-label">Vegetarian</div>
-            </div>
-          </div>
-
-          {/* Search */}
-          <div className="menu-search-wrap">
-            <span className="material-symbols-outlined menu-search-icon">search</span>
-            <input
-              type="text"
-              className="menu-search-input"
-              placeholder="Search paneer, noodles, biryani..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              id="menu-search"
-            />
-            {searchQuery && (
-              <button
-                className="menu-search-clear"
-                onClick={() => setSearchQuery('')}
-                aria-label="Clear search"
-              >
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            )}
-          </div>
+      {/* ── Fixed Video Background (web only) ── */}
+      {!isNative && (
+        <div className="page-bg" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
+          <BackgroundMedia media={menuBackdrop} />
+          <div className="page-overlay" style={{ 
+            position: 'absolute', 
+            inset: 0, 
+            background: 'rgba(20, 19, 19, 0.85)', 
+            backdropFilter: 'blur(12px)' 
+          }} />
         </div>
-      </section>
+      )}
+
+      {/* ── Hero (web only) ── */}
+      {!isNative && (
+        <section className="menu-hero" style={{ background: 'transparent' }}>
+          <div className="menu-hero-content">
+            <div className="menu-hero-badge">
+              <span className="material-symbols-outlined icon-filled">eco</span>
+              100% Vegetarian
+            </div>
+            <h1>
+              Our Complete <span className="accent">Menu</span>
+            </h1>
+            <p className="menu-hero-subtitle">
+              Explore {totalProducts}+ handcrafted dishes across {menuSections.length} categories — from smoky tandoor to
+              creamy curries, every bite tells a story.
+            </p>
+
+            <div className="menu-hero-stats">
+              <div className="menu-hero-stat">
+                <div className="menu-hero-stat-value">{totalProducts}+</div>
+                <div className="menu-hero-stat-label">Dishes</div>
+              </div>
+              <div className="menu-hero-stat">
+                <div className="menu-hero-stat-value">{menuSections.length}</div>
+                <div className="menu-hero-stat-label">Categories</div>
+              </div>
+              <div className="menu-hero-stat">
+                <div className="menu-hero-stat-value">100%</div>
+                <div className="menu-hero-stat-label">Vegetarian</div>
+              </div>
+            </div>
+
+            {/* Search */}
+            <div className="menu-search-wrap">
+              <span className="material-symbols-outlined menu-search-icon">search</span>
+              <input
+                type="text"
+                className="menu-search-input"
+                placeholder="Search paneer, noodles, biryani..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                id="menu-search"
+              />
+              {searchQuery && (
+                <button
+                  className="menu-search-clear"
+                  onClick={() => setSearchQuery('')}
+                  aria-label="Clear search"
+                >
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Category Pills ── */}
       {!isSearching && (
