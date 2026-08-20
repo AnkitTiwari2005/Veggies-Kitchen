@@ -14,6 +14,12 @@ export default function SplashOverlay({ onDone }) {
       onDone()
       return
     }
+
+    // Hide the NATIVE Capacitor splash screen immediately so our JS splash shows
+    import('@capacitor/splash-screen').then(({ SplashScreen }) => {
+      SplashScreen.hide({ fadeOutDuration: 200 }).catch(() => {})
+    })
+
     // in → hold → out
     const t1 = setTimeout(() => setPhase('hold'), 600)
     const t2 = setTimeout(() => setPhase('out'), 1400)
