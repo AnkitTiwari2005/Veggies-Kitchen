@@ -72,7 +72,7 @@ const CDN = {
   tandooriAloo: 'https://cdn.dotpe.in/catalog/sku-images/2026-01-08/35TH8F56T0FBZ6CG4PR.jpg',
   tandooriMushroom: 'https://cdn.dotpe.in/catalog/sku-images/2026-01-08/35TH8F56T0FBZ6CG4OE.jpg',
   tandooriStuffedChaap: 'https://cdn.dotpe.in/catalog/sku-images/2026-01-08/35TH8F56T0FBZ6CG4OT.jpg',
-  seekhKebab: 'https://lh3.googleusercontent.com/aida/AP1WRLu1OXkhlpJqq3N5zR8jgrvLjxuV9T79Q6v8IcKVI-_47kYj2E_jitMHakVNELbUIH241uFKmfaiUdEfgOUx0zHF_8MylPqgHmAzlttDUJ-e9p36BG5PCRJLtIY5CNsgguNUOa-QtTg5IfN9UlnJr-P4Kd-GPbn3s4S4r8Pnezi-1o2iFp0TTg1oKf7w7dHmwmMVrCc92ksgTMDLW_7BVjTesRnUk_eM2ygRWGLR47gJHDCJbK3phkSxOsc',
+  seekhKebab: 'https://cdn.dotpe.in/catalog/sku-images/2026-01-08/35TH8F56T0FBZ6CG4OE.jpg',
   platterTikkaChaap: 'https://cdn.dotpe.in/catalog/sku-images/2026-01-08/35TH8F1ANMEAX07NNU0.jpg',
   platterTikkaMushroom: 'https://cdn.dotpe.in/catalog/sku-images/2026-01-08/35TH8F1ANMEAX07NNUQ.jpg',
   platterTikkaAlooChaap: 'https://cdn.dotpe.in/catalog/sku-images/2026-01-08/35TH8F1ANMEAX07NNVU.jpg',

@@ -88,12 +88,12 @@ function ProductCard({ item, sectionId, onTap }) {
       <div className="swiggy-card__left">
         <div className="swiggy-card__veg-row">
           <VegDotSVG />
-          {item.featured && (
-            <span className="swiggy-card__chefs-pick">
-              <StarSVG /> Chef's Pick
-            </span>
-          )}
         </div>
+        {item.featured && (
+          <span className="swiggy-card__chefs-pick">
+            <StarSVG /> Chef's Pick
+          </span>
+        )}
         <h3 className="swiggy-card__name">{item.name}</h3>
         <div className="swiggy-card__price">₹{item.price}</div>
         {item.description && (

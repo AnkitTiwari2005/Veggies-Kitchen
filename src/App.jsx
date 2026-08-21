@@ -846,7 +846,7 @@ export default function App() {
               ) : currentPage === 'track' ? (
                 <OrderTrackingPage orderId={trackingOrderId} />
               ) : currentPage === 'login' ? (
-                <OTPLoginPage onSuccess={() => { window.location.hash = '#/' }} />
+                <OTPLoginPage onSuccess={() => { const r = sessionStorage.getItem('postLoginRedirect'); sessionStorage.removeItem('postLoginRedirect'); window.location.hash = r || '#/' }} />
               ) : (
                 isNative ? (
                   <main><NativeHomePage onNavigate={handleNavigate} /></main>

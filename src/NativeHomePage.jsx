@@ -7,9 +7,9 @@ import DishDetailSheet from './DishDetailSheet'
 
 /* ── Inline SVGs — zero emojis ─────────────────────────────────── */
 const FireSVG = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="#FF5722">
-    <path d="M12 2C8 6 6 10 8 14c1 2 3 3 4 5 1-2 3-3 4-5 2-4 0-8-4-12z"/>
-    <path d="M12 10c-1 2-1 4 0 6 1-2 2-4 0-6z" fill="#FF9800"/>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M12 23c-3.87 0-7-3.13-7-7 0-2.38 1.19-4.47 3-5.74C8 10.26 8.5 9 9 8c.38 1.38 1.5 2.5 3 3 0-3 1.5-5.5 4-8 0 3.5 2 6 2 9.5 0 3.87-2.13 7-6 10.5z" fill="#FF5722"/>
+    <path d="M12 23c-2.21 0-4-1.79-4-4 0-1.5.8-2.8 2-3.46.5-.28 1-.8 1.5-1.54.5.75 1 1.26 1.5 1.54 1.2.67 2 1.96 2 3.46 0 2.21-1.29 4-3 4z" fill="#FF9800"/>
   </svg>
 )
 const StarSVG = () => (
@@ -44,10 +44,10 @@ const ShieldSVG = () => (
 )
 const TandoorSVG = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <ellipse cx="12" cy="17" rx="8" ry="4" fill="rgba(255,87,34,0.15)" stroke="#FF5722" strokeWidth="1.5"/>
-    <path d="M8 17V9a4 4 0 018 0v8" stroke="#FF5722" strokeWidth="1.5" strokeLinecap="round"/>
-    <path d="M10 9c0-2 4-4 4-7" stroke="#FF9800" strokeWidth="1.3" strokeLinecap="round"/>
-    <path d="M13 10c0-1.5 2-2.5 2-5" stroke="#FF9800" strokeWidth="1" strokeLinecap="round"/>
+    <ellipse cx="12" cy="17" rx="8" ry="4" fill="rgba(76,175,80,0.15)" stroke="#4CAF50" strokeWidth="1.5"/>
+    <path d="M8 17V9a4 4 0 018 0v8" stroke="#4CAF50" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M10 9c0-2 4-4 4-7" stroke="#81C784" strokeWidth="1.3" strokeLinecap="round"/>
+    <path d="M13 10c0-1.5 2-2.5 2-5" stroke="#81C784" strokeWidth="1" strokeLinecap="round"/>
   </svg>
 )
 
@@ -178,19 +178,6 @@ export default function NativeHomePage({ onNavigate }) {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Dots */}
-      <div className="nh-dots">
-        {BANNERS.map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            className={`nh-dot${i === bannerIndex ? ' active' : ''}`}
-            onClick={() => { setBannerIndex(i); startTimer() }}
-            aria-label={`Banner ${i + 1}`}
-          />
-        ))}
       </div>
 
       {/* ── Categories ─────────────────────────────────── */}

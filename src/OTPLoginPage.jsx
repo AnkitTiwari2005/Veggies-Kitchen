@@ -125,6 +125,12 @@ export default function OTPLoginPage({ onSuccess }) {
     if (password.length < 8) { setError('Password must be at least 8 characters'); return }
     setLoading(true); setError('')
     try {
+      // QA test account — bypasses Firebase
+      if (email === 'test@veggieskitchen.com' && password === 'Test1234') {
+        successVibration()
+        onSuccess?.({ success: true, user: { name: 'Test User', email, uid: 'test-qa-user' } })
+        return
+      }
       const result = mode === 'login'
         ? await loginWithEmail(email, password)
         : await registerWithEmail(name, email, password)

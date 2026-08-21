@@ -1,10 +1,11 @@
 .otp-page {
-  min-height: 100dvh;
+  height: 100dvh;
   background: #0d1117;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  overflow: hidden;
 }
 
 .otp-inner {

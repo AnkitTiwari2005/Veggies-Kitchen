@@ -114,23 +114,23 @@
 /* Dots */
 .ob-dots {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
 }
 .ob-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #333;
+  background: rgba(255,255,255,0.25);
   border: none;
   padding: 0;
   cursor: pointer;
   transition: all 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  min-height: 7px;
+  min-height: 8px;
 }
 .ob-dot.active {
-  width: 28px;
-  border-radius: 4px;
+  width: 24px;
+  border-radius: 12px;
   /* background set inline per slide accent */
 }
 
