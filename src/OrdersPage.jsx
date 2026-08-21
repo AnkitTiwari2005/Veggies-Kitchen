@@ -4,9 +4,10 @@ import { useAuth } from './AuthContext';
 import { useCart } from './CartContext';
 import { SECTION_EMOJI } from './menuData';
 import { API_BASE } from './config';
+import { isNative } from './hooks/useCapacitor';
 import './OrdersPage.css';
 
-export default function OrdersPage() {
+export default function OrdersPage({ onTrack }) {
   const { menuBackdrop, menuSections } = useAdmin();
   const { user, login } = useAuth();
   const { replaceCart } = useCart();
@@ -37,7 +38,7 @@ export default function OrdersPage() {
         const orderData = await res.json();
         fetchOrders();
         
-        let message = `Hi Veggie Kitchen! ❌\n\nI want to CANCEL my order that was just placed.\n\n`;
+        let message = `Hi Veggie Kitchen! <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>\n\nI want to CANCEL my order that was just placed.\n\n`;
         message += `*Order ID:* #${orderData._id.slice(-6).toUpperCase()}\n`;
         message += `*Name:* ${orderData.customerName}\n`;
         message += `*Total Amount:* ₹${orderData.total.toFixed(2)}\n\n`;
@@ -77,7 +78,7 @@ export default function OrdersPage() {
         <span className="material-symbols-outlined" style={{ fontSize: '64px', color: 'var(--primary)', marginBottom: '16px' }}>receipt_long</span>
         <h1 className="text-headline-lg">Your Orders</h1>
         <p className="text-body-lg" style={{ marginBottom: '24px', opacity: 0.8 }}>Please login to view your orders.</p>
-        <button className="btn-primary glow-button" onClick={login} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <button className="btn-primary glow-button" onClick={() => { if (isNative) { window.location.hash = '#/login' } else { login() } }} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span className="material-symbols-outlined">login</span>
           Login with Google
         </button>
@@ -138,7 +139,7 @@ export default function OrdersPage() {
                         </button>
                       ) : (
                         <button className="track-order-btn" onClick={() => {
-                          const message = `Hi Veggie Kitchen! ❌\n\nI want to CANCEL my order #${order._id.slice(-6).toUpperCase()} but it has been more than 10 minutes since I placed it. Can you please help?`;
+                          const message = `Hi Veggie Kitchen! <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>\n\nI want to CANCEL my order #${order._id.slice(-6).toUpperCase()} but it has been more than 10 minutes since I placed it. Can you please help?`;
                           const whatsappUrl = `https://api.whatsapp.com/send/?phone=919811797407&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`;
                           window.open(whatsappUrl, '_blank');
                         }} style={{ background: 'transparent', border: '1px solid var(--on-surface-variant)', color: 'var(--on-surface-variant)' }}>
@@ -147,7 +148,7 @@ export default function OrdersPage() {
                         </button>
                       )
                     )}
-                    <button className="track-order-btn glow-button">
+                    <button className="track-order-btn glow-button" onClick={() => onTrack?.(order._id)}>
                       <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>my_location</span>
                       Track Order
                     </button>
@@ -174,7 +175,7 @@ export default function OrdersPage() {
                         {item.image ? (
                           <img alt={item.name} src={item.image} />
                         ) : (
-                          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>🍽️</div>
+                          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg></div>
                         )}
                       </div>
                       <div>

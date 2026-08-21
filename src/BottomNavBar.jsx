@@ -30,7 +30,6 @@ const MenuSVG = ({ active }) => (
     <rect x="3" y="5" width="18" height="2" rx="1" fill={active ? '#4CAF50' : '#666'}/>
     <rect x="3" y="11" width="14" height="2" rx="1" fill={active ? '#4CAF50' : '#666'}/>
     <rect x="3" y="17" width="11" height="2" rx="1" fill={active ? '#4CAF50' : '#666'}/>
-    {active && <circle cx="20" cy="17" r="3" fill="#4CAF50" opacity="0.7"/>}
   </svg>
 )
 

@@ -1871,37 +1871,37 @@ body.is-native .checkout-sticky-cta button:active {
 .nh-banner__cta {
   align-self: flex-start;
   padding: 6px 18px;
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.95);
+  border: none;
   border-radius: 20px;
-  color: white;
+  color: #1B5E20;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   z-index: 1;
   min-height: 30px;
 }
-.nh-banner__cta:active { background: rgba(255,255,255,0.35); }
+.nh-banner__cta:active { background: rgba(255,255,255,0.75); }
 
 /* Banner dots */
 .nh-dots {
   display: flex;
   justify-content: center;
-  gap: 6px;
-  margin: 10px 0 20px;
+  gap: 5px;
+  margin: 8px 0 12px;
 }
 .nh-dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: #444;
+  background: rgba(255,255,255,0.2);
   border: none;
   padding: 0;
   cursor: pointer;
   transition: all 300ms ease;
-  min-height: 6px;
+  min-height: 5px;
 }
 .nh-dot.active {
-  width: 22px;
+  width: 16px;
   border-radius: 3px;
   background: var(--native-green);
 }
@@ -1993,8 +1993,11 @@ body.is-native .checkout-sticky-cta button:active {
   text-align: center;
   max-width: 72px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  line-height: 1.3;
 }
 
 /* ── Popular items horizontal scroll ─────────────────────────── */

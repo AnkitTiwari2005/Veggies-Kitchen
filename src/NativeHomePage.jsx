@@ -233,11 +233,6 @@ export default function NativeHomePage({ onNavigate }) {
                 <div key={`pop-${idx}`} className="nh-pcard" onClick={() => setSelectedDish(item)}>
                   <div className="nh-pcard__imgwrap">
                     <img src={item.image} alt={item.name} loading="lazy" />
-                    {item.featured && (
-                      <span className="nh-pcard__badge">
-                        <StarSVG /> Chef's Pick
-                      </span>
-                    )}
                   </div>
                   <div className="nh-pcard__body">
                     <span className="nh-pcard__name">{item.name}</span>

@@ -5,13 +5,13 @@ import { format } from 'date-fns'
 import './OrderTrackingPage.css'
 
 const STATUS_STEPS = [
-  { key: 'Pending',          label: 'Order Placed',      icon: '📋', desc: 'We received your order' },
-  { key: 'Preparing',        label: 'Being Prepared',    icon: '👨‍🍳', desc: 'Our chefs are cooking your meal' },
-  { key: 'Out for Delivery', label: 'Out for Delivery',  icon: '🛵', desc: 'Your order is on its way!' },
-  { key: 'Delivered',        label: 'Delivered',          icon: '🎉', desc: 'Enjoy your meal!' },
+  { key: 'Pending',          label: 'Order Placed',      icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#FFA500" strokeWidth="1.5"/><path d="M12 7v5l3 3" stroke="#FFA500" strokeWidth="1.5" strokeLinecap="round"/></svg>, desc: 'We received your order' },
+  { key: 'Preparing',        label: 'Being Prepared',    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 13.87A4 4 0 017.41 6a5.11 5.11 0 011.05-1.54 5 5 0 017.08 0A5.11 5.11 0 0116.59 6 4 4 0 0118 13.87V21H6v-7.13z" stroke="#FFA500" strokeWidth="1.5"/><line x1="9" y1="21" x2="9" y2="18" stroke="#FFA500" strokeWidth="1.5"/></svg>, desc: 'Our chefs are cooking your meal' },
+  { key: 'Out for Delivery', label: 'Out for Delivery',  icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 17H3V5h11v10" stroke="#42a5f5" strokeWidth="1.5" strokeLinecap="round"/><path d="M14 17h6M14 13h3l3 4" stroke="#42a5f5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="7.5" cy="17.5" r="1.5" fill="#42a5f5"/><circle cx="17.5" cy="17.5" r="1.5" fill="#42a5f5"/></svg>, desc: 'Your order is on its way!' },
+  { key: 'Delivered',        label: 'Delivered',          icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#4CAF50"/><path d="M8 12l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, desc: 'Enjoy your meal!' },
 ]
 
-const CANCELLED_STEP = { key: 'Cancelled', label: 'Cancelled', icon: '❌', desc: 'This order was cancelled' }
+const CANCELLED_STEP = { key: 'Cancelled', label: 'Cancelled', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#f44336"/><path d="M15 9l-6 6M9 9l6 6" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, desc: 'This order was cancelled' }
 
 function getStepIndex(status) {
   const idx = STATUS_STEPS.findIndex(s => s.key === status)
@@ -26,11 +26,11 @@ function EstimatedTime({ order }) {
   const now = new Date()
   const minsLeft = Math.max(0, Math.round((eta - now) / 60_000))
   const isDelivered = order.status === 'Delivered'
-  if (isDelivered) return <div className="eta-chip delivered">✅ Delivered {format(created, 'h:mm a')}</div>
+  if (isDelivered) return <div className="eta-chip delivered"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{display: 'inline', verticalAlign: 'text-bottom'}}><circle cx="12" cy="12" r="10" fill="#4CAF50"/><path d="M8 12l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg> Delivered {format(created, 'h:mm a')}</div>
   if (order.status === 'Cancelled') return null
   return (
     <div className="eta-chip">
-      ⏱ {minsLeft > 0 ? `~${minsLeft} mins away` : 'Arriving soon'}
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{display: 'inline', verticalAlign: 'text-bottom'}}><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/><path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg> {minsLeft > 0 ? `~${minsLeft} mins away` : 'Arriving soon'}
     </div>
   )
 }
@@ -112,7 +112,7 @@ export default function OrderTrackingPage({ orderId }) {
         <h1>Order Status</h1>
       </div>
       <div className="tracking-error">
-        <span>😕</span>
+        <span><svg width="48" height="48" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/><path d="M12 8v4m0 4h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg></span>
         <h3>{error}</h3>
         <button onClick={() => navigate(-1)}>Go Back</button>
       </div>
@@ -171,7 +171,7 @@ export default function OrderTrackingPage({ orderId }) {
                   <div key={step.key} className={`timeline-step ${completed ? 'completed' : ''} ${active ? 'active' : ''}`}>
                     <div className="step-indicator">
                       <div className={`step-icon ${active ? 'pulse' : ''}`}>
-                        {completed && !active ? '✅' : step.icon}
+                        {completed && !active ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#4CAF50"/><path d="M8 12l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg> : step.icon}
                       </div>
                       {i < steps.length - 1 && (
                         <div className={`step-line ${completed ? 'completed-line' : ''}`} />
@@ -228,7 +228,7 @@ export default function OrderTrackingPage({ orderId }) {
               <span>₹{order.total?.toFixed(0)}</span>
             </div>
             <div className="payment-badge">
-              {order.paymentMethod === 'razorpay' ? '💳 Paid Online' : '💵 Cash on Delivery'}
+              {order.paymentMethod === 'razorpay' ? <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{marginRight: 4, verticalAlign: 'middle'}}><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/><path d="M2 10h20" stroke="currentColor" strokeWidth="2"/></svg> Paid Online</> : <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{marginRight: 4, verticalAlign: 'middle'}}><rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" strokeWidth="2"/><circle cx="12" cy="12" r="2" stroke="currentColor" strokeWidth="2"/></svg> Cash on Delivery</>}
             </div>
           </div>
         </div>
@@ -238,7 +238,7 @@ export default function OrderTrackingPage({ orderId }) {
           <div className="delivery-card">
             <h2 className="card-title">Delivery Address</h2>
             <div className="address-row">
-              <span className="addr-icon">📍</span>
+              <span className="addr-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" strokeWidth="2"/><circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/></svg></span>
               <div className="addr-text">
                 <p>{order.deliveryAddress.street}</p>
                 <p>{order.deliveryAddress.city}, {order.deliveryAddress.state} {order.deliveryAddress.pincode}</p>
@@ -251,11 +251,11 @@ export default function OrderTrackingPage({ orderId }) {
         <div className="tracking-actions">
           {(order.status === 'Delivered' || order.status === 'Cancelled') && (
             <button className="reorder-btn" onClick={handleReorder} disabled={reordering}>
-              {reordering ? 'Loading...' : '🔄 Reorder'}
+              {reordering ? 'Loading...' : <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{marginRight: 6, verticalAlign: 'middle'}}><path d="M21 2v6h-6M3 12a9 9 0 0115-6.7L21 8M3 22v-6h6M21 12a9 9 0 01-15 6.7L3 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg> Reorder</>}
             </button>
           )}
           <a href="tel:+917977234416" className="call-btn">
-            📞 Call Restaurant
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{marginRight: 6, verticalAlign: 'middle'}}><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg> Call Restaurant
           </a>
         </div>
       </div>

@@ -277,8 +277,14 @@ export default function CheckoutPage() {
       )}
 
       {/* ── Page Title ── */}
-      <div className="co-title-wrap">
-        <h1 className="co-title text-headline-lg">Checkout</h1>
+      {/* Checkout header — replaces app bar which is hidden on this page */}
+      <div className="co-checkout-header">
+        <button className="co-back-btn" onClick={() => window.history.back()} aria-label="Go back">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="#f0f0f0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+        <h1 className="co-header-title">Checkout</h1>
       </div>
 
       <div className="co-grid">
@@ -288,7 +294,7 @@ export default function CheckoutPage() {
           {/* ── Cart Items — compact Zomato-style ── */}
           <div className="co-panel co-cart-panel">
             <h2 className="co-panel-title">
-              <span className="material-symbols-outlined co-icon-accent">restaurant</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{flexShrink:0}}><path d="M3 2v7c0 1.1.9 2 2 2h2v11h2V11h2c1.1 0 2-.9 2-2V2M7 2v7" stroke="#4CAF50" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M17 2v5a3 3 0 003 3h0V2" stroke="#4CAF50" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M17 10v12" stroke="#4CAF50" strokeWidth="1.5" strokeLinecap="round"/></svg>
               Your Order
               {cartCount > 0 && <span className="co-item-count">{cartCount} item{cartCount !== 1 ? 's' : ''}</span>}
             </h2>
@@ -451,12 +457,13 @@ export default function CheckoutPage() {
 
               {/* COD badge */}
               <div className="co-cod-row">
+                {/* banknote icon */}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <rect x="2" y="6" width="20" height="14" rx="2" stroke="#4CAF50" strokeWidth="1.5" fill="none"/>
-                  <path d="M2 10h20" stroke="#4CAF50" strokeWidth="1.5"/>
+                  <rect x="2" y="5" width="20" height="14" rx="2" stroke="#4CAF50" strokeWidth="1.5"/>
+                  <circle cx="12" cy="12" r="3" stroke="#4CAF50" strokeWidth="1.5"/>
+                  <path d="M6 9v.01M18 15v.01" stroke="#4CAF50" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
                 <span>Cash on Delivery</span>
-                <span className="co-cod-badge">COD</span>
               </div>
 
               {/* Delivery time */}
@@ -500,9 +507,9 @@ export default function CheckoutPage() {
                 <div className="co-form">
                   {/* Name */}
                   <div className="co-field">
-                    <label className="co-field-label">{orderForOther ? 'Recipient Name' : 'Your Name'}</label>
+                    <label className="co-field-label">{orderForOther ? 'Recipient Name' : 'Your Name'} <span className="co-required">*</span></label>
                     <div className="co-input-wrap">
-                      <span className="material-symbols-outlined co-input-icon">person</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="co-input-icon"><circle cx="12" cy="7" r="4" stroke="#666" strokeWidth="1.5"/><path d="M4 21v-2a4 4 0 014-4h8a4 4 0 014 4v2" stroke="#666" strokeWidth="1.5" strokeLinecap="round"/></svg>
                       <input className="co-input" type="text" placeholder="Full name"
                         value={orderForOther ? recipientForm.name : deliveryForm.name}
                         onChange={(e) => orderForOther ? updateRecipient('name', e.target.value) : updateField('name', e.target.value)}
@@ -514,7 +521,7 @@ export default function CheckoutPage() {
                   <div className="co-field">
                     <label className="co-field-label">Email Address</label>
                     <div className="co-input-wrap">
-                      <span className="material-symbols-outlined co-input-icon">mail</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="co-input-icon"><rect x="2" y="4" width="20" height="16" rx="2" stroke="#666" strokeWidth="1.5"/><path d="M22 7l-10 7L2 7" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       <input className="co-input" type="email" placeholder="For order confirmation"
                         value={orderForOther ? recipientForm.email : deliveryForm.email}
                         onChange={(e) => orderForOther ? updateRecipient('email', e.target.value) : updateField('email', e.target.value)}
@@ -528,9 +535,9 @@ export default function CheckoutPage() {
 
                   {/* Phone */}
                   <div className="co-field">
-                    <label className="co-field-label">{orderForOther ? 'Recipient Phone' : 'Contact Number'}</label>
+                    <label className="co-field-label">{orderForOther ? 'Recipient Phone' : 'Contact Number'} <span className="co-required">*</span></label>
                     <div className="co-input-wrap">
-                      <span className="material-symbols-outlined co-input-icon">phone</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="co-input-icon"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.81.36 1.6.66 2.35a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.74.3 1.53.52 2.35.66A2 2 0 0122 16.92z" stroke="#666" strokeWidth="1.5"/></svg>
                       <input className="co-input" type="tel" placeholder="10-digit mobile" maxLength={10}
                         value={orderForOther ? recipientForm.phone : deliveryForm.phone}
                         onChange={(e) => {
@@ -547,9 +554,9 @@ export default function CheckoutPage() {
 
                   {/* Street */}
                   <div className="co-field">
-                    <label className="co-field-label">House / Street / Area</label>
+                    <label className="co-field-label">House / Street / Area <span className="co-required">*</span></label>
                     <div className="co-input-wrap">
-                      <span className="material-symbols-outlined co-input-icon">home</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="co-input-icon"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z" stroke="#666" strokeWidth="1.5" strokeLinejoin="round"/><path d="M9 21V12h6v9" stroke="#666" strokeWidth="1.5" strokeLinecap="round"/></svg>
                       <input className="co-input" type="text" placeholder="House no., Street, Area"
                         value={orderForOther ? recipientForm.street : deliveryForm.street}
                         onChange={(e) => orderForOther ? updateRecipient('street', e.target.value) : updateField('street', e.target.value)}
@@ -560,14 +567,14 @@ export default function CheckoutPage() {
                   {/* City + State + PIN in one row */}
                   <div className="co-field-row">
                     <div className="co-field co-field-half">
-                      <label className="co-field-label">City</label>
+                      <label className="co-field-label">City <span className="co-required">*</span></label>
                       <input className="co-input co-input-plain" type="text" placeholder="City"
                         value={orderForOther ? recipientForm.city : deliveryForm.city}
                         onChange={(e) => orderForOther ? updateRecipient('city', e.target.value) : updateField('city', e.target.value)}
                       />
                     </div>
                     <div className="co-field co-field-half">
-                      <label className="co-field-label">PIN Code</label>
+                      <label className="co-field-label">PIN Code <span className="co-required">*</span></label>
                       <input className="co-input co-input-plain" type="text" placeholder="6-digit PIN" maxLength={6}
                         value={orderForOther ? recipientForm.pincode : deliveryForm.pincode}
                         onChange={(e) => {
@@ -581,7 +588,7 @@ export default function CheckoutPage() {
                   {/* Instructions */}
                   <div className="co-field">
                     <label className="co-field-label">Delivery Note (optional)</label>
-                    <textarea className="co-textarea" placeholder="Ring bell, leave at door…" rows={2}
+                    <textarea className="co-textarea" placeholder="Ring bell, leave at door…" rows={2} style={{resize:'none'}}
                       value={orderForOther ? recipientForm.instructions : deliveryForm.instructions}
                       onChange={(e) => orderForOther ? updateRecipient('instructions', e.target.value) : updateField('instructions', e.target.value)}
                     />
@@ -619,7 +626,7 @@ export default function CheckoutPage() {
             {/* ── Bill Summary ── */}
             <div className="co-panel co-summary-panel">
               <h2 className="co-panel-title">
-                <span className="material-symbols-outlined co-icon-accent">receipt_long</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{flexShrink:0}}><path d="M9 5H7a2 2 0 00-2 2v12l3-2 3 2 3-2 3 2V7a2 2 0 00-2-2h-2" stroke="#4CAF50" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><rect x="9" y="3" width="6" height="4" rx="1" stroke="#4CAF50" strokeWidth="1.5"/></svg>
                 Summary
               </h2>
               <div className="co-summary-lines">
@@ -635,10 +642,25 @@ export default function CheckoutPage() {
                   <span>Delivery</span>
                   <span className="co-summary-value">₹{delivery.toFixed(2)}</span>
                 </div>
+                {cartSubtotal < 300 && delivery > 0 && (
+                  <div className="co-free-delivery-nudge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#FFB300"/>
+                    </svg>
+                    Add ₹{(300 - cartSubtotal).toFixed(0)} more for free delivery!
+                  </div>
+                )}
               </div>
               <div className="co-summary-total">
                 <span>Total</span>
                 <span className="co-total-value">₹{cartTotal.toFixed(2)}</span>
+              </div>
+              <div className="co-delivery-eta">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="9" stroke="#888" strokeWidth="1.5"/>
+                  <path d="M12 7v5l3 3" stroke="#888" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+                Estimated delivery: {deliveryTime === 'now' ? '30-45 minutes' : 'Scheduled'}
               </div>
 
               <button
@@ -650,19 +672,30 @@ export default function CheckoutPage() {
                   "Placing Order..."
                 ) : orderPlaced ? (
                   <>
-                    <span className="material-symbols-outlined">check_circle</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#4CAF50"/><path d="M8 12l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     Order Placed!
                   </>
                 ) : (
                   <>
                     Place Order
-                    <span className="material-symbols-outlined">arrow_forward</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </>
                 )}
               </button>
 
               {!isFormValid && cartItems.length > 0 && (
-                <p className="co-validation-hint">Fill in all required delivery details to place your order.</p>
+                <p className="co-validation-hint">
+                  {(() => {
+                    const f = orderForOther ? recipientForm : deliveryForm;
+                    const missing = [];
+                    if (!f.name.trim()) missing.push('Name');
+                    if (!validatePhone(f.phone)) missing.push('Phone');
+                    if (!f.street.trim()) missing.push('Address');
+                    if (!f.city.trim()) missing.push('City');
+                    if (!f.pincode.trim() || !validatePincode(f.pincode)) missing.push('PIN');
+                    return missing.length > 0 ? `Missing: ${missing.join(', ')}` : 'Fill in delivery details';
+                  })()}
+                </p>
               )}
             </div>
 

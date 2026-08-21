@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useAdmin, BackgroundMedia } from './AdminContext'
 import { useAuth } from './AuthContext'
-import { API_BASE } from './config'
 import { isNative } from './hooks/useCapacitor'
 import { lightTap, mediumTap, successVibration, errorVibration } from './services/haptics'
 import { initNotifications } from './services/notifications'
@@ -10,11 +9,11 @@ import './AccountPage.css'
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
-  Delivered:        { icon: '✅', cls: 'status-delivered' },
-  Cancelled:        { icon: '❌', cls: 'status-cancelled' },
-  'Out for Delivery':{ icon: '🛵', cls: 'status-progress' },
-  Preparing:        { icon: '👨‍🍳', cls: 'status-progress' },
-  Pending:          { icon: '⏳', cls: 'status-progress' },
+  Delivered: { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#4CAF50"/><path d="M8 12l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, color: '#4CAF50', bg: 'rgba(76,175,80,0.1)' },
+  Cancelled: { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#f44336"/><path d="M15 9l-6 6M9 9l6 6" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, color: '#f44336', bg: 'rgba(244,67,54,0.1)' },
+  'Out for Delivery': { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11v10" stroke="#42a5f5" strokeWidth="1.5" strokeLinecap="round"/><path d="M14 17h2m4 0h2M14 13h3l3 4" stroke="#42a5f5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="7.5" cy="17.5" r="1.5" fill="#42a5f5"/><circle cx="17.5" cy="17.5" r="1.5" fill="#42a5f5"/></svg>, color: '#42a5f5', bg: 'rgba(66,165,245,0.1)' },
+  Preparing: { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6v-7.13z" stroke="#FFA500" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><line x1="9" y1="21" x2="9" y2="18" stroke="#FFA500" strokeWidth="1.5"/></svg>, color: '#FFA500', bg: 'rgba(255,165,0,0.1)' },
+  Pending: { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#FFA500" strokeWidth="1.5"/><path d="M12 7v5l3 3" stroke="#FFA500" strokeWidth="1.5" strokeLinecap="round"/></svg>, color: '#FFA500', bg: 'rgba(255,165,0,0.1)' },
 }
 
 function fmtDate(d) {
@@ -62,7 +61,7 @@ function ProfileAvatar({ user, onPhotoChange }) {
       </div>
       {isNative && (
         <button className="avatar-edit-btn" onClick={pickPhoto} aria-label="Change photo" disabled={uploading}>
-          📷
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="white" strokeWidth="1.5"/><circle cx="12" cy="13" r="4" stroke="white" strokeWidth="1.5"/></svg>
         </button>
       )}
     </div>
@@ -74,7 +73,7 @@ function DeleteAccountModal({ onConfirm, onCancel, loading }) {
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal-card" onClick={e => e.stopPropagation()}>
-        <div className="modal-icon">⚠️</div>
+        <div className="modal-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" fill="#f44336" opacity="0.15" stroke="#f44336" strokeWidth="1.5"/><path d="M12 9v4M12 17h.01" stroke="#f44336" strokeWidth="2" strokeLinecap="round"/></svg></div>
         <h2>Delete Account?</h2>
         <p>This will permanently delete your account and all your data. This action cannot be undone.</p>
         <div className="modal-actions">
@@ -129,7 +128,7 @@ function NotificationSettings({ authFetch }) {
   return (
     <div className="settings-item" onClick={toggle} style={{ cursor: 'pointer' }}>
       <div className="settings-item-label">
-        <span className="settings-icon">🔔</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{marginRight:6}}><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="#4CAF50" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M13.73 21a2 2 0 01-3.46 0" stroke="#4CAF50" strokeWidth="1.5" strokeLinecap="round"/></svg>
         Order Notifications
       </div>
       <div className={`toggle-switch ${enabled ? 'on' : ''} ${loading ? 'loading' : ''}`}>
@@ -212,12 +211,19 @@ export default function AccountPage({ onNavigate }) {
             <div className="page-overlay" />
           </div>
         )}
-        <div className="login-wall-content">
-          <span className="login-wall-icon">🥗</span>
+        <div className="login-wall-content" style={{marginTop:'-15vh'}}>
+          <div className="login-wall-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+              <path d="M17 8C8 10 5.9 16.17 3.82 19.99a.5.5 0 00.7.65c.96-.51 2.57-1.39 4.21-1.39C15 19.25 19 13 19 9c0-5-5-7-5-7s2 1 3 6z" fill="#4CAF50"/>
+              <path d="M12 3c0 0-2 3-2 6s1 5 2 6" stroke="#81C784" strokeWidth="1" strokeLinecap="round"/>
+            </svg>
+          </div>
           <h1>Welcome Back</h1>
           <p>Sign in to view your orders, track deliveries, and manage your account.</p>
           <button className="otp-primary-btn" onClick={() => { mediumTap(); onNavigate?.('login') || login() }}>
-            {isNative ? '📱 Sign In' : 'Login with Google'}
+            {isNative ? (
+              <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{marginRight:6,verticalAlign:'middle'}}><rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg>Sign In</>
+            ) : 'Login with Google'}
           </button>
         </div>
       </div>
@@ -249,27 +255,27 @@ export default function AccountPage({ onNavigate }) {
                 maxLength={60}
               />
               <button className="name-save-btn" onClick={saveName} disabled={savingName}>
-                {savingName ? '...' : '✓'}
+                {savingName ? '...' : <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
               </button>
-              <button className="name-cancel-btn" onClick={() => setEditingName(false)}>✕</button>
+              <button className="name-cancel-btn" onClick={() => setEditingName(false)}><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#e6edf3" strokeWidth="2" strokeLinecap="round"/></svg></button>
             </div>
           ) : (
             <div className="name-row">
               <h1 className="account-name">{user.name}</h1>
               {isNative && (
-                <button className="name-edit-btn" onClick={startEditName} aria-label="Edit name">✏️</button>
+                <button className="name-edit-btn" onClick={startEditName} aria-label="Edit name"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="#8b949e" strokeWidth="1.5" strokeLinecap="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#8b949e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
               )}
             </div>
           )}
           <div className="account-contact">
             {user.email && (
               <span className="account-contact-item">
-                <span>✉️</span> {user.email}
+                <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{flexShrink:0}}><rect x="2" y="4" width="20" height="16" rx="2" stroke="#8b949e" strokeWidth="1.5"/><path d="M22 7l-10 7L2 7" stroke="#8b949e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></span> {user.email}
               </span>
             )}
             {user.phone && (
               <span className="account-contact-item">
-                <span>📱</span> {user.phone}
+                <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{flexShrink:0}}><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.81.36 1.6.66 2.35a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.74.3 1.53.52 2.35.66A2 2 0 0122 16.92z" stroke="#8b949e" strokeWidth="1.5"/></svg></span> {user.phone}
               </span>
             )}
           </div>
@@ -286,7 +292,7 @@ export default function AccountPage({ onNavigate }) {
             <div className="card-loading"><div className="mini-spinner" /></div>
           ) : orders.length === 0 ? (
             <div className="card-empty">
-              <span>🛵</span>
+              <span><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11v10" stroke="#555" strokeWidth="1.5" strokeLinecap="round"/><path d="M14 17h2m4 0h2M14 13h3l3 4" stroke="#555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="7.5" cy="17.5" r="1.5" fill="#555"/><circle cx="17.5" cy="17.5" r="1.5" fill="#555"/></svg></span>
               <p>No orders yet. Place your first order!</p>
             </div>
           ) : (
@@ -338,7 +344,7 @@ export default function AccountPage({ onNavigate }) {
             <div className="address-list">
               {user.addresses.map((addr, idx) => (
                 <div key={idx} className="address-item">
-                  <span className="addr-idx-icon">📍</span>
+                  <span className="addr-idx-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{flexShrink:0}}><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#4CAF50"/></svg></span>
                   <div className="addr-text">
                     <p>{addr.street}</p>
                     <p>{addr.city}, {addr.state} {addr.pincode}</p>
@@ -355,20 +361,20 @@ export default function AccountPage({ onNavigate }) {
           <div className="settings-list">
             <NotificationSettings authFetch={authFetch} />
             <div className="settings-item" onClick={() => { lightTap(); window.open('https://api.whatsapp.com/send/?phone=919811797407&text=Hi+Veggies+Kitchen!+I+need+help.', '_blank') }}>
-              <div className="settings-item-label"><span className="settings-icon">💬</span> Help & Support</div>
-              <span className="settings-chevron">›</span>
+              <div className="settings-item-label"><span className="settings-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="#4CAF50" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></span> Help & Support</div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="account-chevron"><path d="M9 18l6-6-6-6" stroke="#484f58" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
             <a className="settings-item" href="#/privacy" onClick={() => lightTap()}>
-              <div className="settings-item-label"><span className="settings-icon">🛡️</span> Privacy Policy</div>
-              <span className="settings-chevron">›</span>
+              <div className="settings-item-label"><span className="settings-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#4CAF50" strokeWidth="1.5" strokeLinejoin="round"/><path d="M9 12l2 2 4-4" stroke="#4CAF50" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></span> Privacy Policy</div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="account-chevron"><path d="M9 18l6-6-6-6" stroke="#484f58" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </a>
             {isNative && (
               <div
                 className="settings-item danger-item"
                 onClick={() => { lightTap(); setShowDeleteModal(true) }}
               >
-                <div className="settings-item-label"><span className="settings-icon">🗑️</span> Delete Account</div>
-                <span className="settings-chevron">›</span>
+                <div className="settings-item-label"><span className="settings-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14" stroke="#f44336" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></span> Delete Account</div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="account-chevron"><path d="M9 18l6-6-6-6" stroke="#484f58" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </div>
             )}
           </div>

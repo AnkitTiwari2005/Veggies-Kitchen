@@ -801,3 +801,135 @@
   padding: 4px 8px;
   cursor: pointer;
 }
+
+/* ── Checkout Header (replaces hidden NativeAppBar) ── */
+.co-checkout-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+body.is-native .co-checkout-header {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
+  background: var(--native-bg, #0a0a0a);
+}
+.co-back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  margin: -8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+}
+.co-back-btn:active {
+  background: rgba(255,255,255,0.08);
+}
+.co-header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--native-text, #f0f0f0);
+}
+
+/* ── Custom Checkboxes ── */
+.co-toggle-row input[type="checkbox"],
+.co-save-addr-row input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #555;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 150ms ease;
+}
+.co-toggle-row input[type="checkbox"]:checked,
+.co-save-addr-row input[type="checkbox"]:checked {
+  background: #4CAF50;
+  border-color: #4CAF50;
+}
+.co-toggle-row input[type="checkbox"]:checked::after,
+.co-save-addr-row input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* ── Textarea ── */
+.co-textarea {
+  resize: none;
+}
+
+/* ── Required field asterisk ── */
+.co-required {
+  color: #EF5350;
+  margin-left: 2px;
+  font-weight: 600;
+}
+
+/* ── Free delivery nudge ── */
+.co-free-delivery-nudge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255,179,0,0.08);
+  border: 1px solid rgba(255,179,0,0.15);
+  border-radius: 8px;
+  margin: 8px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFB300;
+}
+
+/* ── Delivery ETA in summary ── */
+.co-delivery-eta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  font-size: 12px;
+  color: #888;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin-top: 8px;
+}
+
+/* ── Better disabled Place Order button ── */
+.co-place-order-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* ── Input icon fix ── */
+.co-input-wrap {
+  position: relative;
+}
+.co-input-wrap .co-input-icon,
+.co-input-wrap svg.co-input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+.co-input-wrap .co-input {
+  padding-left: 36px;
+}

@@ -174,7 +174,7 @@ export default function OTPLoginPage({ onSuccess }) {
       <div className="otp-inner">
         {/* ── Logo / Header ─────────────────────────────────────────── */}
         <div className="otp-logo">
-          <span className="otp-logo-icon">🥗</span>
+          <span className="otp-logo-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none"><path d="M17 8C8 10 5.9 16.17 3.82 19.99a.5.5 0 00.7.65c.96-.51 2.57-1.39 4.21-1.39C15 19.25 19 13 19 9c0-5-5-7-5-7s2 1 3 6z" fill="#4CAF50"/><path d="M12 3c0 0-2 3-2 6s1 5 2 6" stroke="#81C784" strokeWidth="1" strokeLinecap="round"/></svg></span>
           <h1 className="otp-logo-name">Veggies Kitchen</h1>
           <p className="otp-tagline">Fresh, healthy food — delivered fast</p>
         </div>
@@ -189,7 +189,7 @@ export default function OTPLoginPage({ onSuccess }) {
                   className={`otp-tab ${tab === t ? 'active' : ''}`}
                   onClick={() => { lightTap(); setTab(t); setStep('input') }}
                 >
-                  {t === 'phone' ? '📱 Phone' : '✉️ Email'}
+                  {t === 'phone' ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{marginRight:4,verticalAlign:'middle'}}><rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg>Phone</> : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{marginRight:4,verticalAlign:'middle'}}><rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M22 7l-10 7L2 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>Email</>}
                 </button>
               ))}
             </div>
@@ -199,7 +199,7 @@ export default function OTPLoginPage({ onSuccess }) {
               <div className="otp-form">
                 <p className="otp-hint">We'll send you a one-time password</p>
                 <div className="phone-input-wrap">
-                  <div className="country-code">🇮🇳 +91</div>
+                  <div className="country-code">+91</div>
                   <input
                     type="tel"
                     className="phone-input"
@@ -257,7 +257,11 @@ export default function OTPLoginPage({ onSuccess }) {
                     minLength={8}
                   />
                   <button type="button" className="toggle-pass" onClick={() => setShowPass(v => !v)}>
-                    {showPass ? '🙈' : '👁️'}
+                    {showPass ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" stroke="#888" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><line x1="1" y1="1" x2="23" y2="23" stroke="#888" strokeWidth="1.5"/></svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#888" strokeWidth="1.5"/><circle cx="12" cy="12" r="3" stroke="#888" strokeWidth="1.5"/></svg>
+                    )}
                   </button>
                 </div>
                 {(error || authError) && <div className="otp-error">{error || authError}</div>}

@@ -774,7 +774,8 @@ export default function App() {
   }
 
   const noHeader = currentPage === 'admin' || currentPage === 'search' ||
-                   currentPage === 'track' || currentPage === 'login'
+                   currentPage === 'track' || currentPage === 'login' ||
+                   currentPage === 'checkout'
   const noFooter = currentPage === 'admin' || currentPage === 'search' ||
                    currentPage === 'track' || currentPage === 'login'
 
