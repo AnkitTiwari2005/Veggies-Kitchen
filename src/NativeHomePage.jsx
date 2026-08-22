@@ -306,7 +306,6 @@ export default function NativeHomePage({ onNavigate }) {
         </div>
       </div>
 
-      <div style={{ height: 120 }} />
 
       {/* Dish Detail Sheet */}
       {selectedDish && (

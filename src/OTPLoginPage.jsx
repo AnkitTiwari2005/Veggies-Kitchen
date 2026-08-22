@@ -26,7 +26,7 @@ async function getFirebaseAuth() {
 const TABS = ['phone', 'email']
 
 export default function OTPLoginPage({ onSuccess }) {
-  const { loginWithOTP, loginWithEmail, registerWithEmail, authError, setAuthError } = useAuth()
+  const { loginWithOTP, loginWithEmail, registerWithEmail, authError, setAuthError, loginAsTestUser } = useAuth()
 
   const [tab, setTab] = useState('phone')         // 'phone' | 'email'
   const [mode, setMode] = useState('login')        // 'login' | 'register'
@@ -125,10 +125,12 @@ export default function OTPLoginPage({ onSuccess }) {
     if (password.length < 8) { setError('Password must be at least 8 characters'); return }
     setLoading(true); setError('')
     try {
-      // QA test account — bypasses Firebase
+      // QA test account — bypasses Firebase, sets AuthContext user state directly
       if (email === 'test@veggieskitchen.com' && password === 'Test1234') {
+        const testUser = { name: 'Test User', email, uid: 'test-qa-user' }
+        loginAsTestUser(testUser)
         successVibration()
-        onSuccess?.({ success: true, user: { name: 'Test User', email, uid: 'test-qa-user' } })
+        onSuccess?.({ success: true, user: testUser })
         return
       }
       const result = mode === 'login'

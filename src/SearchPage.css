@@ -4,10 +4,8 @@
 .search-page-native {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
   background: var(--native-bg, #0a0a0a);
   color: var(--native-text, #f0f0f0);
-  padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: 80px;
 }
 

@@ -93,6 +93,7 @@ export default function NativeAppBar({ onSearchClick }) {
           type="button"
           className="nab-bell-btn"
           aria-label="Notifications"
+          onClick={() => { lightTap(); window.location.hash = '#/notifications' }}
         >
           <BellSVG />
         </button>

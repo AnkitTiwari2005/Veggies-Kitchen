@@ -5,6 +5,7 @@
 import { useState } from 'react'
 import { useLocation } from './LocationContext'
 import { lightTap, successVibration } from './services/haptics'
+import { isCityServiceable } from './serviceArea'
 
 const POPULAR_LOCATIONS = [
   { name: 'Lajpat Nagar 4', desc: 'Near Moolchand Metro' },
@@ -20,6 +21,8 @@ const POPULAR_LOCATIONS = [
 export default function LocationPickerModal() {
   const { isModalOpen, setIsModalOpen, address, setAddress, detectLocation, locationStatus } = useLocation()
   const [customInput, setCustomInput] = useState('')
+  const [unserviceable, setUnserviceable] = useState(false)
+  const [unserviceableCity, setUnserviceableCity] = useState('')
 
   if (!isModalOpen) return null
 
@@ -30,10 +33,17 @@ export default function LocationPickerModal() {
 
   const handleUseGPS = async () => {
     lightTap()
+    setUnserviceable(false)
     const result = await detectLocation(false)
     if (result) {
-      successVibration()
-      setIsModalOpen(false)
+      const city = result.city || result.fullAddress || ''
+      if (!isCityServiceable(city)) {
+        setUnserviceable(true)
+        setUnserviceableCity(city || 'your area')
+      } else {
+        successVibration()
+        setIsModalOpen(false)
+      }
     }
   }
 
@@ -94,6 +104,17 @@ export default function LocationPickerModal() {
             <div className="loc-spinner" />
           )}
         </button>
+
+        {/* Fix 16: Unserviceable area banner */}
+        {unserviceable && (
+          <div style={{background:'rgba(239,83,80,0.12)',border:'1px solid rgba(239,83,80,0.3)',borderRadius:10,padding:'10px 14px',margin:'8px 0',display:'flex',alignItems:'center',gap:10}}>
+            <span className="material-symbols-outlined" style={{color:'#ef5350',fontSize:20}}>location_off</span>
+            <div>
+              <div style={{color:'#ef5350',fontWeight:700,fontSize:13}}>We don't deliver here yet</div>
+              <div style={{color:'#888',fontSize:12,marginTop:2}}>We currently serve South Delhi only. Please select one of the areas below.</div>
+            </div>
+          </div>
+        )}
 
         {/* Custom Location Search */}
         <form className="loc-search-form" onSubmit={handleCustomSubmit}>

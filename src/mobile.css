@@ -1555,20 +1555,24 @@ body.is-native .empty-state__cta {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   LOGIN PAGE — negate body padding since NativeAppBar is hidden
+   LOGIN PAGE — Fix 4: position:fixed bypasses body padding entirely
+   The previous margin-top+height approach still allowed scroll.
    ═══════════════════════════════════════════════════════════════════ */
 body.is-native .otp-page {
-  margin-top: calc(-1 * (var(--safe-area-top) + var(--app-bar-height)));
-  height: calc(100dvh + var(--safe-area-top) + var(--app-bar-height));
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  margin: 0;
+  overflow: hidden;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    CHECKOUT NATIVE OVERRIDES
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Checkout page needs bottom padding for floating elements */
+/* Fix 2: Increase bottom padding so sticky bar never covers content */
 body.is-native .checkout-page {
-  padding-bottom: 160px;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
   /* NativeAppBar is hidden on checkout, but body.is-native still has
      padding-top for it — negate that so header sits flush at top */
   margin-top: calc(-1 * (var(--safe-area-top) + var(--app-bar-height)));
@@ -1580,12 +1584,12 @@ body.is-native .checkout-page > .page-bg {
   display: none !important;
 }
 
-/* Single-column layout on native */
+/* Fix 23: Single-column layout on native — no extra horizontal padding (checkout-page handles it) */
 body.is-native .co-grid {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 0 16px;
+  gap: 12px;
+  padding: 0;
 }
 
 body.is-native .co-left,
@@ -2365,7 +2369,7 @@ body.is-native .menu-category-card.glass-panel {
 
 body.is-native .checkout-container,
 body.is-native .checkout-page {
-  padding-bottom: 80px !important;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
   background: var(--native-bg) !important;
 }
 

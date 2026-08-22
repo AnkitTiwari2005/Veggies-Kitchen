@@ -621,6 +621,7 @@ import SearchPage from './SearchPage'
 import OrderTrackingPage from './OrderTrackingPage'
 import OTPLoginPage from './OTPLoginPage'
 import OnboardingCarousel from './OnboardingCarousel'
+import NotificationsPage from './NotificationsPage'
 
 export default function App() {
   /* ── Routing state ──────────────────────────────────────────────────────── */
@@ -656,6 +657,7 @@ export default function App() {
       else if (hash === '#/admin') { setCurrentPage('admin'); window.scrollTo({ top: 0 }) }
       else if (hash === '#/search') { setCurrentPage('search'); window.scrollTo({ top: 0 }) }
       else if (hash === '#/login') { setCurrentPage('login'); window.scrollTo({ top: 0 }) }
+      else if (hash === '#/notifications') { setCurrentPage('notifications'); window.scrollTo({ top: 0 }) }
       else if (hash.startsWith('#/orders/')) {
         const id = hash.replace('#/orders/', '')
         setTrackingOrderId(id)
@@ -669,12 +671,21 @@ export default function App() {
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
 
+  /* ── Fix 22: Global modal-open tracker (DishDetailSheet pushes a state entry) */
+  // DishDetailSheet calls window.__modalOpen = true / false so back button can detect it
+  // The back button then dispatches a custom 'closeModal' event instead of navigating
+
   /* ── Android hardware back button ───────────────────────────────────────── */
   useEffect(() => {
     if (!isNative) return
     let cleanup = () => {}
     import('@capacitor/app').then(({ App: CapApp }) => {
       const listener = CapApp.addListener('backButton', ({ canGoBack }) => {
+        // Fix 22: If a dish modal / sheet is open, close it first
+        if (window.__modalOpen) {
+          window.dispatchEvent(new CustomEvent('closeModal'))
+          return
+        }
         if (currentPage !== 'home') {
           // Navigate back one level
           window.history.back()
@@ -845,6 +856,8 @@ export default function App() {
                 <SearchPage />
               ) : currentPage === 'track' ? (
                 <OrderTrackingPage orderId={trackingOrderId} />
+              ) : currentPage === 'notifications' ? (
+                <main><NotificationsPage /></main>
               ) : currentPage === 'login' ? (
                 <OTPLoginPage onSuccess={() => { const r = sessionStorage.getItem('postLoginRedirect'); sessionStorage.removeItem('postLoginRedirect'); window.location.hash = r || '#/' }} />
               ) : (

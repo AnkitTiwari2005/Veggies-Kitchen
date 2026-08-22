@@ -1006,3 +1006,85 @@ body.is-native .co-checkout-header {
 .co-rec-stepper { display:flex; align-items:center; background:#4CAF50; border-radius:6px; overflow:hidden; }
 .co-rec-stepper button { width:26px; height:26px; border:none; background:transparent; color:white; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .co-rec-stepper span { min-width:20px; text-align:center; color:white; font-size:12px; font-weight:700; }
+
+/* ===================================================
+   FIX 11: SAVINGS CORNER + COUPON SHEET
+   =================================================== */
+.co-savings-corner { padding:14px 16px; background:var(--native-surface,#161b22); border:1px solid var(--native-border,rgba(255,255,255,0.08)); border-radius:14px; cursor:pointer; margin-bottom:12px; }
+.co-coupon-row-new { display:flex; align-items:center; gap:12px; }
+.co-coupon-icon-box { width:36px; height:36px; background:#FF6F00; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.co-coupon-label { font-size:14px; font-weight:600; color:var(--native-text,#f0f0f0); flex:1; }
+
+.co-sheet-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:200; display:flex; align-items:flex-end; justify-content:center; }
+.co-sheet { width:100%; max-width:480px; background:var(--native-surface,#161b22); border-radius:16px 16px 0 0; padding:20px 16px calc(env(safe-area-inset-bottom,0px) + 20px); }
+.co-sheet__header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.co-sheet__title { font-size:16px; font-weight:700; color:var(--native-text,#f0f0f0); margin:0; }
+.co-sheet__close { background:none; border:none; color:var(--native-text,#f0f0f0); cursor:pointer; padding:4px; }
+.co-coupon-input-row { display:flex; gap:8px; }
+.co-coupon-apply-btn { padding:10px 20px; background:#4CAF50; border:none; border-radius:10px; color:white; font-weight:700; cursor:pointer; white-space:nowrap; }
+
+/* ===================================================
+   FIX 12: STICKY BOTTOM BAR — Two visual zones
+   =================================================== */
+.co-sticky-bottom { position:fixed; bottom:0; left:0; right:0; display:flex; align-items:center; gap:12px; padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 10px); background:var(--native-surface,#161b22); border-top:1px solid var(--native-border,rgba(255,255,255,0.08)); z-index:100; }
+.co-sticky-bottom__payment { display:flex; align-items:center; gap:8px; min-width:0; }
+.co-sticky-pay-label { font-size:10px; font-weight:700; color:var(--native-text-secondary,#888); letter-spacing:0.5px; text-transform:uppercase; }
+.co-sticky-pay-method { font-size:12px; font-weight:600; color:var(--native-text,#f0f0f0); }
+.co-sticky-bottom__cta { flex:1; height:52px; background:#4CAF50; border:none; border-radius:14px; color:white; font-size:15px; font-weight:700; cursor:pointer; padding:0 16px; white-space:nowrap; }
+.co-sticky-bottom__cta:disabled { opacity:0.4; }
+.co-sticky-bottom__cta:active { background:#388E3C; }
+
+/* ===================================================
+   FIX 13: COMPLETE YOUR MEAL — Horizontal scroll
+   =================================================== */
+.co-rec-panel { margin-bottom:12px; }
+.co-rec-tabs { display:flex; gap:6px; margin-bottom:14px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px; }
+.co-rec-tabs::-webkit-scrollbar { display:none; }
+.co-rec-tab { padding:7px 16px; border-radius:20px; background:rgba(255,255,255,0.06); border:none; color:var(--native-text-secondary,#888); font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.co-rec-tab.active { background:#4CAF50; color:white; }
+.co-rec-scroll { display:flex; gap:12px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
+.co-rec-scroll::-webkit-scrollbar { display:none; }
+.co-rec-card-h { flex-shrink:0; width:110px; display:flex; flex-direction:column; gap:6px; }
+.co-rec-img-wrap { position:relative; width:110px; height:90px; border-radius:10px; overflow:hidden; background:var(--native-surface-2,#1c1c1c); }
+.co-rec-img-h { width:100%; height:100%; object-fit:cover; }
+.co-rec-emoji-h { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:32px; }
+.co-rec-add-circle { position:absolute; top:6px; right:6px; width:28px; height:28px; border-radius:50%; background:#4CAF50; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.4); }
+.co-rec-stepper-overlay { position:absolute; top:6px; right:6px; display:flex; align-items:center; background:#4CAF50; border-radius:14px; overflow:hidden; }
+.co-rec-stepper-overlay button { width:24px; height:24px; background:transparent; border:none; color:white; font-size:14px; font-weight:700; cursor:pointer; }
+.co-rec-stepper-overlay span { min-width:18px; text-align:center; color:white; font-size:12px; font-weight:700; }
+.co-rec-info-h { padding:0 2px; }
+.co-rec-veg-row { display:flex; align-items:center; gap:4px; margin-bottom:2px; }
+.co-rec-name-h { font-size:11px; font-weight:600; color:var(--native-text,#f0f0f0); }
+.co-rec-price-h { font-size:12px; font-weight:700; color:var(--native-text,#f0f0f0); }
+
+/* ===================================================
+   FIX 14: YOUR ORDER — Utility row (Add Items, Cooking, Cutlery)
+   =================================================== */
+.co-utility-row { display:flex; gap:6px; margin-top:12px; flex-wrap:wrap; }
+.co-util-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; background:var(--native-surface-2,#1c1c1c); border:1px solid var(--native-border,rgba(255,255,255,0.08)); border-radius:20px; color:var(--native-text,#f0f0f0); font-size:12px; font-weight:600; cursor:pointer; }
+.co-cutlery-toggle { cursor:pointer; }
+.co-cutlery-box { display:inline-block; width:14px; height:14px; border:1.5px solid #4CAF50; border-radius:3px; flex-shrink:0; }
+.co-cutlery-box.checked { background:#4CAF50; }
+.co-customize-link { display:inline-flex; align-items:center; gap:2px; font-size:11px; color:#4CAF50; font-weight:600; cursor:pointer; margin-top:2px; }
+
+/* ===================================================
+   FIX 15: TO PAY — Collapsible summary
+   =================================================== */
+.co-to-pay-panel { cursor:pointer; }
+.co-to-pay-row { display:flex; align-items:center; gap:12px; }
+.co-to-pay-left { display:flex; align-items:center; gap:10px; flex:1; }
+.co-to-pay-icon-wrap { width:36px; height:36px; background:#388E3C; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.co-to-pay-label { font-size:14px; font-weight:600; color:var(--native-text,#f0f0f0); }
+.co-to-pay-original { font-size:13px; color:#888; text-decoration:line-through; margin-left:6px; }
+.co-to-pay-amount { font-size:16px; font-weight:800; color:var(--native-text,#f0f0f0); margin-left:6px; }
+.co-to-pay-savings { font-size:12px; color:#4CAF50; font-weight:600; margin-top:2px; }
+.co-to-pay-chevron { transition:transform 300ms ease; flex-shrink:0; }
+.co-to-pay-chevron.open { transform:rotate(180deg); }
+.co-summary-lines { margin-top:14px; display:flex; flex-direction:column; gap:8px; padding-top:14px; border-top:1px solid var(--native-border,rgba(255,255,255,0.08)); }
+.co-summary-line { display:flex; justify-content:space-between; font-size:13px; color:var(--native-text-secondary,#888); }
+.co-summary-total-line { font-size:14px; font-weight:700; color:var(--native-text,#f0f0f0); margin-top:4px; padding-top:8px; border-top:1px solid var(--native-border,rgba(255,255,255,0.08)); }
+
+/* ===================================================
+   SECTION LABEL (UPPERCASE)
+   =================================================== */
+.co-section-label { font-size:11px; font-weight:700; color:var(--native-text-secondary,#888); letter-spacing:1px; text-transform:uppercase; margin:0 0 10px; }

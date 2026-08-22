@@ -6,7 +6,6 @@
 
 /* ── Menu Page Container ─────────────────────────────────── */
 .menu-page {
-  min-height: 100vh;
   padding-top: 64px; /* below fixed header */
 }
 
@@ -747,6 +746,8 @@
   background: rgba(255,179,0,0.1);
   padding: 2px 7px;
   border-radius: 10px;
+  width: fit-content;
+  align-self: flex-start;
 }
 
 .swiggy-card__name {

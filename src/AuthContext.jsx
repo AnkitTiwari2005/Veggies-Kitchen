@@ -259,6 +259,11 @@ export function AuthProvider({ children }) {
     return apiFetch(path, options)
   }, [])
 
+  // ── QA test account bypass — sets user state directly without Firebase ──────
+  const loginAsTestUser = useCallback((testUser) => {
+    setUser(testUser)
+  }, [])
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -273,6 +278,7 @@ export function AuthProvider({ children }) {
       updateUser,
       authFetch,
       setAuthError,
+      loginAsTestUser,
     }}>
       {children}
     </AuthContext.Provider>

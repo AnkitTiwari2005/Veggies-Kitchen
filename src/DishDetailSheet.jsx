@@ -58,16 +58,28 @@ export default function DishDetailSheet({ item, onClose }) {
   const cartItem = cartItems?.find(i => i.name === item?.name)
   const inCart = cartItem ? cartItem.quantity : 0
 
-  // Animate in on mount
+  // Animate in on mount + register modal open state for back-button (Fix 22)
   useEffect(() => {
     if (item) {
       requestAnimationFrame(() => setVisible(true))
       document.body.style.overflow = 'hidden'
+      window.__modalOpen = true
     }
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+      window.__modalOpen = false
+    }
   }, [item])
 
+  // Fix 22: Listen for closeModal event dispatched by back button handler
+  useEffect(() => {
+    const listener = () => handleClose()
+    window.addEventListener('closeModal', listener)
+    return () => window.removeEventListener('closeModal', listener)
+  }, [])
+
   const handleClose = () => {
+    window.__modalOpen = false
     setVisible(false)
     setTimeout(onClose, 300)
   }
